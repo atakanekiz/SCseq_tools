@@ -42,13 +42,16 @@ gene_grapher <- function(exprs, # expression dataframe (generated with df_extrac
   genes_to_plot <- str_replace_all(genes_to_plot, "[:punct:]|[:space:]", "_")
   genes_to_plot <- genes_to_plot[genes_to_plot %in% colnames(exprs)]
   
-  clusters_to_plot <- gsub("\\+", "\\\\+", clusters_to_plot)
-  clusters_to_plot <- gsub("\\-", "\\\\-", clusters_to_plot)
+
   
   if(sort_plots ==T) {genes_to_plot <- mixedsort(genes_to_plot)}
   
   # Subset clusters of interest
-  if(!is.null(clusters_to_plot)) {exprs <- filter(exprs, str_detect(Cluster, regex(clusters_to_plot, ignore_case=T, comments = F)))}
+  if(!is.null(clusters_to_plot)) {
+    clusters_to_plot <- gsub("\\+", "\\\\+", clusters_to_plot) # Escape special characters for correct subsetting
+    clusters_to_plot <- gsub("\\-", "\\\\-", clusters_to_plot)
+    exprs <- filter(exprs, str_detect(Cluster, regex(clusters_to_plot, ignore_case=T, comments = F)))
+    }
   
   # Subset cells that express markers of interest at any level (>0)
   if(!is.null(pos_marker)) {
