@@ -230,44 +230,45 @@ gene_grapher <- function(exprs, # expression dataframe (generated with df_extrac
 ###################   Test   #################################################################
 ##############################################################################################
 
-ms <- read.delim("mouse_immune_process.txt", header = F)
 
-plot_clust <- c("Nai Cd8+", "Nai Cd4+") #"Act Cd8+", "Mem Cd4+"
-
-
-for(i in plot_clust) {
-
-
-
-
-
-
-gene_grapher(exprs = exprs,
-             genes_to_plot = ms$V1,
-             x_variable = "Sample",
-             clusters_to_plot = "Mem Cd4+",
-             pos_marker = NULL,
-             neg_marker = NULL,
-             plot_type = "box",
-             add_jitter = T,
-             add_mean = T,
-             add_median = F,
-             colors_to_use = c("dodgerblue", "coral2", "gray60", "gold2"),
-             show_stats = T,
-             comparisons = list(c("Young (WT)", "Aged (WT)"), 
-                                c("Aged (WT)", "Aged (146 KO)"), 
-                                c("Aged (146 KO)", "Aged (DKO)"), 
-                                c("Aged (WT)", "Aged (DKO)")),
-             stat_method = "wilcox.test",
-             p_adj_method = "holm",
-             save_pdf = T,
-             append_to_filename = "_immune_process_GO",
-             output_plot = F,
-             assign_global_plotlist = F,
-             show_progress = T,
-             image_columns = 4,
-             image_rows = 4)
-
-             
- }
+# ms <- read.delim("mouse_immune_process.txt", header = F)
+# 
+# plot_clust <- c("Nai Cd8+", "Nai Cd4+") #"Act Cd8+", "Mem Cd4+"
+# 
+# 
+# for(i in plot_clust) {
+# 
+# 
+# 
+# 
+# 
+# 
+# gene_grapher(exprs = exprs,
+#              genes_to_plot = ms$V1,
+#              x_variable = "Sample",
+#              clusters_to_plot = "Mem Cd4+",
+#              pos_marker = NULL,
+#              neg_marker = NULL,
+#              plot_type = "box",
+#              add_jitter = T,
+#              add_mean = T,
+#              add_median = F,
+#              colors_to_use = c("dodgerblue", "coral2", "gray60", "gold2"),
+#              show_stats = T,
+#              comparisons = list(c("Young (WT)", "Aged (WT)"), 
+#                                 c("Aged (WT)", "Aged (146 KO)"), 
+#                                 c("Aged (146 KO)", "Aged (DKO)"), 
+#                                 c("Aged (WT)", "Aged (DKO)")),
+#              stat_method = "wilcox.test",
+#              p_adj_method = "holm",
+#              save_pdf = T,
+#              append_to_filename = "_immune_process_GO",
+#              output_plot = F,
+#              assign_global_plotlist = F,
+#              show_progress = T,
+#              image_columns = 4,
+#              image_rows = 4)
+# 
+#              
+#  }
 
