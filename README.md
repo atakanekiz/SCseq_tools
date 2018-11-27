@@ -22,7 +22,7 @@ The expanding list of functions:
 - gsea_plotter
   - Allows automatic subsetting of the data frame based on sample and cluster identity
   - User-defined number of top hits or a selected pathway can be shown
-  - Regex-based name matching that will prompt further dialog for selecting the
+  - Regex-based name matching of pathway of interest that will prompt further user dialog in case of multiple hits
 
 - Select gene plotter
   - Allows user to chose different plot types (Box, Column, Violin)
