@@ -42,6 +42,9 @@ gene_grapher <- function(exprs, # expression dataframe (generated with df_extrac
   genes_to_plot <- str_replace_all(genes_to_plot, "[:punct:]|[:space:]", "_")
   genes_to_plot <- genes_to_plot[genes_to_plot %in% colnames(exprs)]
   
+  clusters_to_plot <- gsub("\\+", "\\\\+", clusters_to_plot)
+  clusters_to_plot <- gsub("\\-", "\\\\-", clusters_to_plot)
+  
   if(sort_plots ==T) {genes_to_plot <- mixedsort(genes_to_plot)}
   
   # Subset clusters of interest
