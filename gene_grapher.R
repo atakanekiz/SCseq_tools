@@ -12,6 +12,7 @@ gene_grapher <- function(exprs, # expression dataframe (generated with df_extrac
                          add_jitter = T, # Add transparent jitter data points
                          add_mean = T, # Add a red colored point indicating mean value
                          add_median = T, # Add a blue colors point indicating median value
+                         sort_plots = F, # Alphabetical ordering of plots based on gene name
                          colors_to_use = NULL, # Default is rainbow palette. You can provide a character vector
                          show_stats = T, # Calculate and show statistics on graph?
                          comparisons = NULL, # Which stats to show. A list of character vectors (pair-wise)
@@ -40,7 +41,8 @@ gene_grapher <- function(exprs, # expression dataframe (generated with df_extrac
   colnames(exprs) <- str_replace_all(colnames(exprs), "[:punct:]|[:space:]", "_")
   genes_to_plot <- str_replace_all(genes_to_plot, "[:punct:]|[:space:]", "_")
   genes_to_plot <- genes_to_plot[genes_to_plot %in% colnames(exprs)]
-  genes_to_plot <- mixedsort(genes_to_plot)
+  
+  if(sort_plots ==T) {genes_to_plot <- mixedsort(genes_to_plot)}
   
   # Subset clusters of interest
   if(!is.null(clusters_to_plot)) {exprs <- filter(exprs, str_detect(Cluster, regex(clusters_to_plot, ignore_case=T, comments = F)))}
