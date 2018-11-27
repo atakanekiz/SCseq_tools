@@ -172,13 +172,13 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
 # setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 # exprs <- readRDS("aging_exprs.rds")
 
-exprs <- readRDS("aging_exprs.rds")
+# exprs <- readRDS("aging_exprs.rds")
 
-gsea_plotter(exprs, 
-             sample_id = "Young \\(WT\\)", 
-             reference_id = "Aged \\(WT\\)",
-             sample_cluster = "NK",
-             reference_cluster = "NK", gene_set = "hallmark")
+# gsea_plotter(exprs, 
+#             sample_id = "Young \\(WT\\)", 
+#             reference_id = "Aged \\(WT\\)",
+#             sample_cluster = "NK",
+#             reference_cluster = "NK", gene_set = "hallmark")
 
 
 
