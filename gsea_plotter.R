@@ -6,7 +6,6 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
                         reference_id, # Which cells will be selected as 'reference' (ie, the direction of rank ordering)
                         reference_cluster = NULL, # Cell clusters to include in analysis for the reference subset
                         method = "s2n", #"ttest", "difference", "ratio", "welch", "mwt", "bws"), # Method for ranking the genes. For MWT, see PMID: 18344518
-                        humanize_exprs_df = T,
                         gene_set = "hallmark", #"go", "curated", "immune", "motif", "all", "custom"), 
                         nperm = 10000, 
                         minSize = 50, 
@@ -22,8 +21,8 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
   require(grid)
   require(ggplot2) 
   
-  source("gene_ranker_v2.R")
-  source("top_plotter.R")
+  # source("gene_ranker_v2.R")
+  # source("top_plotter.R")
   
   # Read molecular signatures database (MSigDB) gene lists. files must be stored 
   
@@ -148,7 +147,7 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
         
       } else {
         
-        arg_list <- list(samp_clu = sample_cluster, ref_clu = reference_cluster, pos = pos_marker, neg = neg_marker)
+        arg_list <- list(samp_clu = sample_cluster, ref_clu = reference_cluster, pos = paste(pos_marker, collapse = "."), neg = paste(neg_marker, collapse = "."))
         select_non_null <- !sapply(arg_list, is.null)
         
         plot_subtitle <- paste(arg_list[select_non_null], names(arg_list[select_non_null]), sep="", collapse = "__")

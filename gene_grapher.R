@@ -6,8 +6,8 @@ gene_grapher <- function(exprs, # expression dataframe (generated with df_extrac
                          genes_to_plot, # genes to plot 
                          x_variable = c("Sample", "Cluster"), # what to show on x-axis
                          clusters_to_plot = NULL, # select clusters to be subsetted for plot
-                         pos_marker = NULL, # select cells expressing these markers. Provide a comma separated string of gene names 
-                         neg_marker = NULL, # select cells not expressing these markers. Provide a comma separated string of gene names 
+                         pos_marker = NULL, # select cells expressing these markers. Can provide a character vector of length 1 or more
+                         neg_marker = NULL, # select cells not expressing these markers. Can provide a character vector of length 1 or more
                          plot_type = c("box", "bar", "violin"), # the type of plot to be generated
                          add_jitter = T, # Add transparent jitter data points
                          add_mean = T, # Add a red colored point indicating mean value
@@ -56,13 +56,23 @@ gene_grapher <- function(exprs, # expression dataframe (generated with df_extrac
   # Subset cells that express markers of interest at any level (>0)
   if(!is.null(pos_marker)) {
     
-    pos_marker_split <- trimws(strsplit(pos_marker, split = ",")[[1]])
-    exprs <- filter_(exprs, paste(pos_marker_split , "!= 0", collapse = " & "))}
+    # pos_marker_split <- trimws(strsplit(pos_marker, split = ",")[[1]])
+    # exprs <- filter_(exprs, paste(pos_marker_split , "!= 0", collapse = " & "))   # Can be used to pass a comma separated long string "gene1 , gene2"
+    
+    exprs <- filter_(exprs, paste(pos_marker , "!= 0", collapse = " & "))
+    
+    }
+  
   
   # Discard cells that express a marker gene which we want to negatively gate in our analyses
   if(!is.null(neg_marker)) {
-    neg_marker_split <- trimws(strsplit(neg_marker, split = ",")[[1]])
-    exprs <- filter_(exprs, paste(neg_marker_split , "== 0", collapse = " & "))}
+    
+    # neg_marker_split <- trimws(strsplit(neg_marker, split = ",")[[1]])
+    # exprs <- filter_(exprs, paste(neg_marker_split , "== 0", collapse = " & "))  # Can be used to pass a comma separated long string "gene1 , gene2"
+    
+    exprs <- filter_(exprs, paste(neg_marker_split , "== 0", collapse = " & "))
+    
+    }
   
   
   # Report which cells are being analyzed
@@ -209,7 +219,7 @@ gene_grapher <- function(exprs, # expression dataframe (generated with df_extrac
   
   if(save_pdf == T){
     
-    arg_list <- list(cluster = clusters_to_plot, pos = pos_marker, neg = neg_marker)
+    arg_list <- list(cluster = clusters_to_plot, pos = paste(pos_marker, collapse = "."), neg = paste(neg_marker, collapse = "."))
     select_non_null <- !sapply(arg_list, is.null)
     
     if(sum(select_non_null) == 0) {
