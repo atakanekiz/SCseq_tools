@@ -31,27 +31,27 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
   
   if(gene_set == "hallmark"){
     
-    gene_set <- gmtPathways("msigdb_genelists/h.all.v6.2.symbols.gmt")
+    gene_set <- hallmark
   
   } else if(gene_set == "go"){
     
-    gene_set <- gmtPathways("msigdb_genelists/c5.all.v6.2.symbols.gmt")
+    gene_set <- go
       
   } else if(gene_set == "curated"){
     
-    gene_set <- gmtPathways("msigdb_genelists/c2.all.v6.2.symbols.gmt")
+    gene_set <- curated
       
   } else if(gene_set == "immune"){
     
-    gene_set <- gmtPathways("msigdb_genelists/c7.all.v6.2.symbols.gmt")
+    gene_set <- immune
       
   } else if(gene_set == "motif"){
     
-    gene_set <- gmtPathways("msigdb_genelists/c3.all.v6.2.symbols.gmt")
+    gene_set <- motif
       
   } else if(gene_set == "all"){
     
-    gene_set <- gmtPathways("msigdb_genelists/msigdb.v6.2.symbols.gmt")
+    gene_set <- all
       
   } else {gene_set = gene_set} # can pass a named list composing of genes as character vectors in each list element
 

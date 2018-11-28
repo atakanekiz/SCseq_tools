@@ -4,6 +4,8 @@ plotGseaTable2 <- function (pathways, stats, fgseaRes, gseaParam = 1, colwidths 
   require(fgsea)
   environment(plotGseaTable2) <- environment(plotGseaTable) 
   
+  require(gridExtra)
+  
   rnk <- rank(-stats)
   ord <- order(rnk)
   statsAdj <- stats[ord]
