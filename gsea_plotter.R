@@ -13,8 +13,11 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
                         top_n = 10, 
                         gseaParam = 1, 
                         plot_individual = NULL,
-                        append_title = F){
+                        append_title = F,
+                        top_plots_title = T,
+                        seed = 123){
   
+  set.seed(seed)
   
   require(fgsea)
   require(dplyr)
@@ -77,8 +80,22 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
 
   if (is.null(plot_individual)) {
     
+    if(top_plots_title == T) {
+      
+      arg_list <- list(samp_clu = sample_cluster, ref_clu = reference_cluster, pos = paste(pos_marker, collapse = "."), neg = paste(neg_marker, collapse = "."))
+      select_non_null <- !sapply(arg_list, function(x) {identical(x, "")})
+      
+      
+     
+      main_title <- paste(sample_id, "vs", reference_id)
+      plot_subtitle <- paste(names(arg_list[select_non_null]), arg_list[select_non_null],  sep=": ", collapse = "  ")
+      
+      plot_title <- paste0(main_title,"\n", plot_subtitle)
+      
+    }
+    
     top_plotter(gsea_results = res, ranked_genes = ranked_genes, gene_set = gene_set,
-                top_n = top_n, gseaParam = gseaParam)
+                top_n = top_n, gseaParam = gseaParam, plot_title=plot_title)
   } else {
     
     hits <- c(grep(plot_individual, res$pathway, ignore.case = T, value = T))
@@ -148,9 +165,9 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
       } else {
         
         arg_list <- list(samp_clu = sample_cluster, ref_clu = reference_cluster, pos = paste(pos_marker, collapse = "."), neg = paste(neg_marker, collapse = "."))
-        select_non_null <- !sapply(arg_list, is.null)
+        select_non_null <- !sapply(arg_list, function(x) {identical(x, "")})
         
-        plot_subtitle <- paste(arg_list[select_non_null], names(arg_list[select_non_null]), sep="", collapse = "__")
+        plot_subtitle <- paste(names(arg_list[select_non_null]), arg_list[select_non_null],  sep=": ", collapse = "  ")
         
         plotEnrichment(pathway = gene_set[[hits]], stats = ranked_genes) +
           labs(title = paste0(hits[n], sample_id, " vs ", reference_id),
