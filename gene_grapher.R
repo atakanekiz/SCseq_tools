@@ -220,7 +220,10 @@ gene_grapher <- function(exprs, # expression dataframe (generated with df_extrac
   if(save_pdf == T){
     
     arg_list <- list(cluster = clusters_to_plot, pos = paste(pos_marker, collapse = "."), neg = paste(neg_marker, collapse = "."))
-    select_non_null <- !sapply(arg_list, is.null)
+    select_non_null <- !sapply(arg_list, function(x) {identical(x, "")})
+    
+
+    
     
     if(sum(select_non_null) == 0) {
       
@@ -228,7 +231,8 @@ gene_grapher <- function(exprs, # expression dataframe (generated with df_extrac
         
     } else {
       
-      filename <- paste(arg_list[select_non_null], names(arg_list[select_non_null]), collapse = "__")
+      
+      filename <- paste(names(arg_list[select_non_null]), arg_list[select_non_null],  sep=": ", collapse = "  ")
       filename <- paste0(filename,"__", stat_method, append_to_filename, ".pdf")
     }
     
@@ -236,7 +240,7 @@ gene_grapher <- function(exprs, # expression dataframe (generated with df_extrac
       
     ggexport(plotlist = plot_list, filename = filename,
              nrow = image_rows, ncol=image_columns, 
-             height = image_rows*2.5, width = image_columns*1.8, res = 300)
+             height = image_rows*3, width = image_columns*1.8, res = 300)
     
   } 
     
