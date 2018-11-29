@@ -202,7 +202,7 @@ gene_grapher <- function(exprs, # expression dataframe (generated with df_extrac
     if(show_stats == T){ tryCatch(error=function(x){},
                                   
                                   {
-      p <- p + expand_limits(y=y_max*1.6) +
+      p <- p + expand_limits(y=y_max*1.75) +
         stat_pvalue_manual(stat_test, label = "p.signif", size = 2.5)
       
                                   })
