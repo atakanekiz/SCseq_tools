@@ -70,7 +70,7 @@ gene_grapher <- function(exprs, # expression dataframe (generated with df_extrac
     # neg_marker_split <- trimws(strsplit(neg_marker, split = ",")[[1]])
     # exprs <- filter_(exprs, paste(neg_marker_split , "== 0", collapse = " & "))  # Can be used to pass a comma separated long string "gene1 , gene2"
     
-    exprs <- filter_(exprs, paste(neg_marker_split , "== 0", collapse = " & "))
+    exprs <- filter_(exprs, paste(neg_marker , "== 0", collapse = " & "))
     
     }
   
