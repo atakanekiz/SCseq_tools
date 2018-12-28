@@ -50,7 +50,7 @@ gene_grapher <- function(exprs, # expression dataframe (generated with df_extrac
   if(!is.null(clusters_to_plot)) {
     clusters_to_plot <- gsub("\\+", "\\\\+", clusters_to_plot) # Escape special characters for correct subsetting
     clusters_to_plot <- gsub("\\-", "\\\\-", clusters_to_plot)
-    exprs <- filter(exprs, str_detect(clusters_to_plot, regex(clusters_to_plot, ignore_case=T, comments = F)))
+    exprs <- filter(exprs, str_detect(Cluster_id, regex(clusters_to_plot, ignore_case=T, comments = F)))
     }
   
   # Subset cells that express markers of interest at any level (>0)
