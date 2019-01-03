@@ -125,8 +125,11 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
       
       annot_padj <- signif(as.numeric(res[res$pathway==hits[num], "padj"]), digits = 2)
       annot_NES <- signif(as.numeric(res[res$pathway==hits[num], "NES"]),digits=2)
+      annot_ES <- signif(as.numeric(res[res$pathway==hits[num], "ES"]),digits=2)
       
-      grob<- grobTree(textGrob(paste("adj.p: ", annot_padj, "\nNES:", annot_NES), x= 0.1, y=0.35, hjust = 0,
+      grob<- grobTree(textGrob(paste("adj.p: ", annot_padj, "\nNES:", annot_NES), 
+                               x= 0.1, y=annot_ES/2, 
+                               hjust = 0,
                                gp = gpar(col="red", fontsize=13, fontface="italic")))
       
       if(append_title ==F){
@@ -159,8 +162,11 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
       
       annot_padj <- signif(as.numeric(res[res$pathway==hits, "padj"]), digits = 2)
       annot_NES <- signif(as.numeric(res[res$pathway==hits, "NES"]),digits=2)
+      annot_ES <- signif(as.numeric(res[res$pathway==hits, "ES"]),digits=2)
       
-      grob<- grobTree(textGrob(paste("adj.p: ", annot_padj, "\nNES:", annot_NES), x= 0.1, y=0.35, hjust = 0,
+      grob<- grobTree(textGrob(paste("adj.p: ", annot_padj, "\nNES:", annot_NES),
+                               x= 0.1, y=annot_ES/2, 
+                               hjust = 0,
                                gp = gpar(col="red", fontsize=13, fontface="italic")))
       
       if(append_title ==F){
@@ -194,10 +200,14 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
    sample_id  <-  str_replace_all(sample_id, "[:punct:]|[:space:]", "_")
    reference_id <-   str_replace_all(reference_id, "[:punct:]|[:space:]", "_")
     
-    arg_list <- list(samp_clu = sample_cluster, ref_clu = reference_cluster, 
-                     samp_id = sample_id, ref_id = reference_id,
-                     pos = paste(pos_marker, collapse = "."), neg = paste(neg_marker, collapse = "."))
-    select_non_null <- !sapply(arg_list, function(x) {identical(x, "")})
+    arg_list <- list(samp_clu = sample_cluster, 
+                     ref_clu = reference_cluster, 
+                     samp_id = sample_id, 
+                     ref_id = reference_id,
+                     pos = paste(pos_marker, collapse = "."), 
+                     neg = paste(neg_marker, collapse = "."))
+    
+    select_non_null <- !sapply(arg_list, function(x) {identical(x, character(0)})
     select_non_null2 <- !sapply(arg_list, is.null)
     select_non_null <- as.logical(select_non_null * select_non_null2)
     
@@ -209,7 +219,7 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
       
     } else {
       
-      filename <- paste(arg_list[select_non_null], names(arg_list[select_non_null]), sep="_", collapse = "  ")
+      filename <- paste(names(arg_list[select_non_null]), arg_list[select_non_null], sep="_", collapse = "  ")
       filename <- paste0(filename, "_", append_to_filename, ".png")
     }
     
