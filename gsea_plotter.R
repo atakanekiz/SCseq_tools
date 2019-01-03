@@ -1,7 +1,7 @@
 gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, columns are genes and metadata)
                         pos_marker = NULL, # Genes to positively gate cells (cells expressing these markers will be subsetted)
                         neg_marker = NULL, # Genes to negatively gate cells (cells expressing these markers will be discarded)
-                        sample_id, # Which cells will be selected as 'sample' (ie, the direction of rank ordering. Regex based string recognition
+                        sample_id, # Which cells will be selected as 'sample' (ie, the direction of rank ordering. Regex based string recognition. Make sure you escape special characters such as parantheses
                         sample_cluster = NULL, # Cell clusters to include in analysis for the sample subset
                         reference_id, # Which cells will be selected as 'reference' (ie, the direction of rank ordering)
                         reference_cluster = NULL, # Cell clusters to include in analysis for the reference subset
@@ -15,7 +15,9 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
                         plot_individual = NULL,
                         append_title = F,
                         top_plots_title = T,
-                        seed = 123){
+                        seed = 123,
+                        keep_results = T # Save enrichment results as a global object?
+                        ){
   
   set.seed(seed)
   
@@ -76,7 +78,7 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
   res <- fgsea(pathways = gene_set, stats = ranked_genes, 
                nperm = nperm, minSize = minSize, maxSize = maxSize)
   
-  # assign("gsea_res", res, .GlobalEnv)
+  if(keep_results) assign("gsea_res", res, .GlobalEnv)
 
   if (is.null(plot_individual)) {
     
@@ -108,24 +110,24 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
       colnames(multiple_hits) <- "Multiple pathway matches"
       rownames(multiple_hits) <- c(1:length(hits))
       print(multiple_hits)
-      n <- as.numeric(readline(prompt = "Multiple pathways are found. Select a number from the list above "))
+      num <- as.numeric(readline(prompt = "Multiple pathways are found. Select a number from the list above "))
       
       
-      while(!n %in% 1:length(hits)) {
-        n <- as.numeric(readline(prompt=paste0("Please pick a number between 1 and ", length(hits),":    ")))
+      while(!num %in% 1:length(hits)) {
+        num <- as.numeric(readline(prompt=paste0("Please pick a number between 1 and ", length(hits),":    ")))
       }
-      assign("n", n , .GlobalEnv)
+      assign("num", num , .GlobalEnv)
       
-      annot_padj <- signif(as.numeric(res[res$pathway==hits[n], "padj"]), digits = 2)
-      annot_NES <- signif(as.numeric(res[res$pathway==hits[n], "NES"]),digits=2)
+      annot_padj <- signif(as.numeric(res[res$pathway==hits[num], "padj"]), digits = 2)
+      annot_NES <- signif(as.numeric(res[res$pathway==hits[num], "NES"]),digits=2)
       
       grob<- grobTree(textGrob(paste("adj.p: ", annot_padj, "\nNES:", annot_NES), x= 0.1, y=0.35, hjust = 0,
                                gp = gpar(col="red", fontsize=13, fontface="italic")))
       
       if(append_title ==F){
         
-        plotEnrichment(pathway = gene_set[[hits[n]]], stats = ranked_genes) +
-          labs(title = hits[n]) +
+        plotEnrichment(pathway = gene_set[[hits[num]]], stats = ranked_genes) +
+          labs(title = hits[num]) +
           annotation_custom(grob)
         
       } else {
@@ -137,8 +139,8 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
 
         
         
-        plotEnrichment(pathway = gene_set[[hits[n]]], stats = ranked_genes) +
-          labs(title = paste0(hits[n], sample_id, " vs ", reference_id),
+        plotEnrichment(pathway = gene_set[[hits[num]]], stats = ranked_genes) +
+          labs(title = paste0(hits[num], sample_id, " vs ", reference_id),
                subtitle = plot_subtitle)+
           annotation_custom(grob)
         
@@ -170,7 +172,7 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
         plot_subtitle <- paste(names(arg_list[select_non_null]), arg_list[select_non_null],  sep=": ", collapse = "  ")
         
         plotEnrichment(pathway = gene_set[[hits]], stats = ranked_genes) +
-          labs(title = paste0(hits[n], sample_id, " vs ", reference_id),
+          labs(title = paste0(hits, sample_id, " vs ", reference_id),
                subtitle = plot_subtitle)+
           annotation_custom(grob)
         
