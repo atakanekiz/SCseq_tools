@@ -234,7 +234,7 @@ gene_grapher <- function(exprs, # expression dataframe (generated with df_extrac
       
       
       filename <- paste(arg_list[select_non_null], names(arg_list[select_non_null]), sep="_", collapse = "  ")
-      filename <- paste0(filename,"__", stat_method, append_to_filename, ".pdf")
+      filename <- paste0(filename,"__", stat_method, "_", append_to_filename, ".pdf")
     }
     
 

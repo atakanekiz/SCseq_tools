@@ -16,7 +16,12 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
                         append_title = F,
                         top_plots_title = T,
                         seed = 123,
-                        keep_results = T # Save enrichment results as a global object?
+                        keep_results = T, # Save enrichment results as a global object?
+                        save_png = T,
+                        png_units = "in",
+                        png_width = 4,
+                        png_height = 3,
+                        append_to_filename = ""
                         ){
   
   set.seed(seed)
@@ -180,6 +185,36 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
       
     }
     
+  }
+  
+  if(save_png == T){
+    
+   sample_cluster <- str_replace_all(sample_cluster, "[:punct:]|[:space:]", "_")
+   reference_cluster <-  str_replace_all(reference_cluster, "[:punct:]|[:space:]", "_")
+   sample_id  <-  str_replace_all(sample_id, "[:punct:]|[:space:]", "_")
+   reference_id <-   str_replace_all(reference_id, "[:punct:]|[:space:]", "_")
+    
+    arg_list <- list(samp_clu = sample_cluster, ref_clu = reference_cluster, 
+                     samp_id = sample_id, ref_id = reference_id,
+                     pos = paste(pos_marker, collapse = "."), neg = paste(neg_marker, collapse = "."))
+    select_non_null <- !sapply(arg_list, function(x) {identical(x, "")})
+    select_non_null2 <- !sapply(arg_list, is.null)
+    select_non_null <- as.logical(select_non_null * select_non_null2)
+    
+    
+    
+    if(sum(select_non_null) == 0) {
+      
+      filename <- paste0("Unsubsetted_data_plots__", ".pdf")
+      
+    } else {
+      
+      filename <- paste(arg_list[select_non_null], names(arg_list[select_non_null]), sep="_", collapse = "  ")
+      filename <- paste0(filename, "_", append_to_filename, ".png")
+    }
+    
+    ggsave(filename = filename, width = png_width, height = png_height, units = png_units)
+  
   }
   
 }
