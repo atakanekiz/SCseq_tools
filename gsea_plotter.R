@@ -90,7 +90,7 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
     if(top_plots_title == T) {
       
       arg_list <- list(samp_clu = sample_cluster, ref_clu = reference_cluster, pos = paste(pos_marker, collapse = "."), neg = paste(neg_marker, collapse = "."))
-      select_non_null <- !sapply(arg_list, function(x) {identical(x, "")})
+      select_non_null <- !sapply(arg_list, function(x) {identical(x, character(0))})
       
       
      
@@ -127,30 +127,44 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
       annot_NES <- signif(as.numeric(res[res$pathway==hits[num], "NES"]),digits=2)
       annot_ES <- signif(as.numeric(res[res$pathway==hits[num], "ES"]),digits=2)
       
-      grob<- grobTree(textGrob(paste("adj.p: ", annot_padj, "\nNES:", annot_NES), 
-                               x= 0.1, y=annot_ES/2, 
-                               hjust = 0,
-                               gp = gpar(col="red", fontsize=13, fontface="italic")))
+      # grob<- grobTree(textGrob(paste("adj.p: ", annot_padj, "\nNES:", annot_NES), 
+      #                          x= 0.1, y=annot_ES, 
+      #                          hjust = 0,
+      #                          gp = gpar(col="red", fontsize=3, fontface="italic")))
+      
+      annot_text <- paste("adj.p: ", annot_padj, "\nNES:", annot_NES)
       
       if(append_title ==F){
         
+        # plotEnrichment(pathway = gene_set[[hits[num]]], stats = ranked_genes) +
+        #   labs(title = hits[num]) +
+        #   annotation_custom(grob)
+        
         plotEnrichment(pathway = gene_set[[hits[num]]], stats = ranked_genes) +
           labs(title = hits[num]) +
-          annotation_custom(grob)
+          annotate("text", x=x_pos, y=annot_ES/2, label = annot_text, colour = "red", size=4)+
+          theme(plot.title = element_text(size=5, hjust = 0.5))
         
       } else {
         
         arg_list <- list(samp_clu = sample_cluster, ref_clu = reference_cluster, pos = pos_marker, neg = neg_marker)
         select_non_null <- !sapply(arg_list, is.null)
         
-          plot_subtitle <- paste(arg_list[select_non_null], names(arg_list[select_non_null]), sep="", collapse = "__")
+        plot_subtitle <- paste(names(arg_list[select_non_null]), arg_list[select_non_null], sep="", collapse = "__")
 
         
         
+        # plotEnrichment(pathway = gene_set[[hits[num]]], stats = ranked_genes) +
+        #   labs(title = paste0(hits[num], sample_id, " vs ", reference_id),
+        #        subtitle = plot_subtitle)+
+        #   annotation_custom(grob)
+        
         plotEnrichment(pathway = gene_set[[hits[num]]], stats = ranked_genes) +
-          labs(title = paste0(hits[num], sample_id, " vs ", reference_id),
-               subtitle = plot_subtitle)+
-          annotation_custom(grob)
+          labs(title = hits[num],
+               subtitle = paste0(sample_id, " vs ", reference_id, ". Subsetted on: ",plot_subtitle))+
+          annotate("text" , x=x_pos, y=annot_ES/2, label = annot_text, colour = "red", size=4)+
+          theme(plot.title = element_text(size=10, hjust = 0.5),
+                plot.subtitle = element_text(size=6, hjust = 0.5))
         
       }
       
@@ -163,29 +177,45 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
       annot_padj <- signif(as.numeric(res[res$pathway==hits, "padj"]), digits = 2)
       annot_NES <- signif(as.numeric(res[res$pathway==hits, "NES"]),digits=2)
       annot_ES <- signif(as.numeric(res[res$pathway==hits, "ES"]),digits=2)
+      x_pos <- length(ranked_genes)/5
       
-      grob<- grobTree(textGrob(paste("adj.p: ", annot_padj, "\nNES:", annot_NES),
-                               x= 0.1, y=annot_ES/2, 
-                               hjust = 0,
-                               gp = gpar(col="red", fontsize=13, fontface="italic")))
+      # grob<- grobTree(textGrob(paste("adj.p: ", annot_padj, "\nNES:", annot_NES),
+      #                          x= 0.1, y=annot_ES, 
+      #                          hjust = 0,
+      #                          gp = gpar(col="red", fontsize=3, fontface="italic")))
+      
+      annot_text <- paste("adj.p: ", annot_padj, "\nNES:", annot_NES)
+      
       
       if(append_title ==F){
         
+        # plotEnrichment(pathway = gene_set[[hits]], stats = ranked_genes) +
+        #   labs(title = hits) +
+        #   annotation_custom(grob)
+        
         plotEnrichment(pathway = gene_set[[hits]], stats = ranked_genes) +
           labs(title = hits) +
-          annotation_custom(grob)
+          annotate("text", x=x_pos, y=annot_ES/2, label = annot_text, colour = "red", size=4)
         
       } else {
         
         arg_list <- list(samp_clu = sample_cluster, ref_clu = reference_cluster, pos = paste(pos_marker, collapse = "."), neg = paste(neg_marker, collapse = "."))
-        select_non_null <- !sapply(arg_list, function(x) {identical(x, "")})
+        # select_non_null <- !sapply(arg_list, function(x) {identical(x, character(0))})
+        select_non_null <- !sapply(arg_list, is.null)
         
         plot_subtitle <- paste(names(arg_list[select_non_null]), arg_list[select_non_null],  sep=": ", collapse = "  ")
         
+        # plotEnrichment(pathway = gene_set[[hits]], stats = ranked_genes) +
+        #   labs(title = paste0(hits, sample_id, " vs ", reference_id),
+        #        subtitle = plot_subtitle)+
+        #   annotation_custom(grob)
+        
         plotEnrichment(pathway = gene_set[[hits]], stats = ranked_genes) +
-          labs(title = paste0(hits, sample_id, " vs ", reference_id),
-               subtitle = plot_subtitle)+
-          annotation_custom(grob)
+          labs(title = hits,
+               subtitle = paste0(sample_id, " vs ", reference_id, ". Subsetted on: ",plot_subtitle))+
+          annotate("text", x=x_pos, y=annot_ES/2, label = annot_text, colour = "red", size=4)+
+          theme(plot.title = element_text(size=10, hjust = 0.5),
+                plot.subtitle = element_text(size=6, hjust = 0.5))
         
       }
       
@@ -195,10 +225,10 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
   
   if(save_png == T){
     
-   sample_cluster <- str_replace_all(sample_cluster, "[:punct:]|[:space:]", "_")
-   reference_cluster <-  str_replace_all(reference_cluster, "[:punct:]|[:space:]", "_")
-   sample_id  <-  str_replace_all(sample_id, "[:punct:]|[:space:]", "_")
-   reference_id <-   str_replace_all(reference_id, "[:punct:]|[:space:]", "_")
+   sample_cluster <- str_replace_all(sample_cluster, "[:punct:]|[:space:]", "")
+   reference_cluster <-  str_replace_all(reference_cluster, "[:punct:]|[:space:]", "")
+   sample_id  <-  str_replace_all(sample_id, "[:punct:]|[:space:]", "")
+   reference_id <-   str_replace_all(reference_id, "[:punct:]|[:space:]", "")
     
     arg_list <- list(samp_clu = sample_cluster, 
                      ref_clu = reference_cluster, 
@@ -207,10 +237,11 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
                      pos = paste(pos_marker, collapse = "."), 
                      neg = paste(neg_marker, collapse = "."))
     
-    select_non_null <- !sapply(arg_list, function(x) {identical(x, character(0)})
+    select_non_null <- !sapply(arg_list, function(x) {identical(x, character(0))})
     select_non_null2 <- !sapply(arg_list, is.null)
     select_non_null <- as.logical(select_non_null * select_non_null2)
     
+
     
     
     if(sum(select_non_null) == 0) {
