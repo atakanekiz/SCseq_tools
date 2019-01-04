@@ -90,12 +90,12 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
     if(top_plots_title == T) {
       
       arg_list <- list(samp_clu = sample_cluster, ref_clu = reference_cluster, pos = paste(pos_marker, collapse = "."), neg = paste(neg_marker, collapse = "."))
-      select_non_null <- !sapply(arg_list, function(x) {identical(x, character(0))})
+      select_non_null <- !sapply(arg_list, function(x) {identical(x, "")})
       
       
      
       main_title <- paste(sample_id, "vs", reference_id)
-      plot_subtitle <- paste(names(arg_list[select_non_null]), arg_list[select_non_null],  sep=": ", collapse = "  ")
+      plot_subtitle <- paste(names(arg_list[select_non_null]), arg_list[select_non_null],  sep=": ", collapse = "__")
       
       plot_title <- paste0(main_title,"\n", plot_subtitle)
       
@@ -148,9 +148,11 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
       } else {
         
         arg_list <- list(samp_clu = sample_cluster, ref_clu = reference_cluster, pos = pos_marker, neg = neg_marker)
-        select_non_null <- !sapply(arg_list, is.null)
+        select_non_null <- !sapply(arg_list, function(x) {identical(x, "")})
+        select_non_null2 <- !sapply(arg_list, is.null)
+        select_non_null <- as.logical(select_non_null * select_non_null2)
         
-        plot_subtitle <- paste(names(arg_list[select_non_null]), arg_list[select_non_null], sep="", collapse = "__")
+        plot_subtitle <- paste(names(arg_list[select_non_null]), arg_list[select_non_null], sep=": ", collapse = "__")
 
         
         
@@ -161,7 +163,7 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
         
         plotEnrichment(pathway = gene_set[[hits[num]]], stats = ranked_genes) +
           labs(title = hits[num],
-               subtitle = paste0(sample_id, " vs ", reference_id, ". Subsetted on: ",plot_subtitle))+
+               subtitle = paste(sample_id, "vs", reference_id, plot_subtitle))+
           annotate("text" , x=x_pos, y=annot_ES/2, label = annot_text, colour = "red", size=4)+
           theme(plot.title = element_text(size=10, hjust = 0.5),
                 plot.subtitle = element_text(size=6, hjust = 0.5))
@@ -200,10 +202,12 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
       } else {
         
         arg_list <- list(samp_clu = sample_cluster, ref_clu = reference_cluster, pos = paste(pos_marker, collapse = "."), neg = paste(neg_marker, collapse = "."))
-        # select_non_null <- !sapply(arg_list, function(x) {identical(x, character(0))})
-        select_non_null <- !sapply(arg_list, is.null)
         
-        plot_subtitle <- paste(names(arg_list[select_non_null]), arg_list[select_non_null],  sep=": ", collapse = "  ")
+        select_non_null <- !sapply(arg_list, function(x) {identical(x, "")})
+        select_non_null2 <- !sapply(arg_list, is.null)
+        select_non_null <- as.logical(select_non_null * select_non_null2)
+        
+        plot_subtitle <- paste(names(arg_list[select_non_null]), arg_list[select_non_null],  sep=": ", collapse = " ")
         
         # plotEnrichment(pathway = gene_set[[hits]], stats = ranked_genes) +
         #   labs(title = paste0(hits, sample_id, " vs ", reference_id),
@@ -212,7 +216,7 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
         
         plotEnrichment(pathway = gene_set[[hits]], stats = ranked_genes) +
           labs(title = hits,
-               subtitle = paste0(sample_id, " vs ", reference_id, ". Subsetted on: ",plot_subtitle))+
+               subtitle = paste(sample_id, "vs", reference_id, plot_subtitle))+
           annotate("text", x=x_pos, y=annot_ES/2, label = annot_text, colour = "red", size=4)+
           theme(plot.title = element_text(size=10, hjust = 0.5),
                 plot.subtitle = element_text(size=6, hjust = 0.5))
@@ -250,7 +254,7 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
       
     } else {
       
-      filename <- paste(names(arg_list[select_non_null]), arg_list[select_non_null], sep="_", collapse = "  ")
+      filename <- paste(names(arg_list[select_non_null]), arg_list[select_non_null], sep="_", collapse = " ")
       filename <- paste0(filename, "_", append_to_filename, ".png")
     }
     
