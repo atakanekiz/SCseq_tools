@@ -250,7 +250,7 @@ gene_grapher <- function(exprs, # expression dataframe (generated with df_extrac
       filename <- paste0(filename,"__", stat_method, "_", append_to_filename, ".pdf")
     }
     
-
+  filename <- gsub("\\\\", "", filename)
       
     ggexport(plotlist = plot_list, filename = filename,
              nrow = image_rows, ncol=image_columns, 
