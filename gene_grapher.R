@@ -40,6 +40,15 @@ gene_grapher <- function(exprs, # expression dataframe (generated with df_extrac
   
   colnames(exprs) <- str_replace_all(colnames(exprs), "[:punct:]|[:space:]", "_")
   genes_to_plot <- str_replace_all(genes_to_plot, "[:punct:]|[:space:]", "_")
+  
+  gene_not_found <- genes_to_plot[!match(tolower(genes_to_plot), tolower(colnames(exprs)), nomatch = 0)]
+  
+  
+  if(length(gene_not_found) > 0) {message(paste("Following genes are not found in data set: ", paste(gene_not_found, collapse = ", ")))}
+  
+  # Match and correct capitalization of gene list
+  genes_to_plot <- grep(genes_to_plot, colnames(exprs), ignore.case = T, value = T)
+  
   genes_to_plot <- genes_to_plot[genes_to_plot %in% colnames(exprs)]
   
   genes_to_plot <- unique(genes_to_plot)
