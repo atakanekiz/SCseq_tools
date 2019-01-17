@@ -42,6 +42,7 @@ gene_grapher <- function(exprs, # expression dataframe (generated with df_extrac
   genes_to_plot <- str_replace_all(genes_to_plot, "[:punct:]|[:space:]", "_")
   genes_to_plot <- genes_to_plot[genes_to_plot %in% colnames(exprs)]
   
+  genes_to_plot <- unique(genes_to_plot)
 
   
   if(sort_plots ==T) {genes_to_plot <- mixedsort(genes_to_plot)}
