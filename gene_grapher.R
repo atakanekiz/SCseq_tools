@@ -46,11 +46,14 @@ gene_grapher <- function(exprs, # expression dataframe (generated with df_extrac
   
   if(length(gene_not_found) > 0) {message(paste("Following genes are not found in data set: ", paste(gene_not_found, collapse = ", ")))}
   
-  # Match and correct capitalization of gene list
-  genes_to_plot <- grep(genes_to_plot, colnames(exprs), ignore.case = T, value = T)
+  # # Match and correct capitalization of gene list
+  # genes_to_plot <- grep(genes_to_plot, colnames(exprs), ignore.case = T, value = T)
+  # 
+  # genes_to_plot <- genes_to_plot[genes_to_plot %in% colnames(exprs)]
   
-  genes_to_plot <- genes_to_plot[genes_to_plot %in% colnames(exprs)]
-  
+  # # Match and correct capitalization of gene list
+  genes_to_plot <- colnames(exprs)[tolower(colnames(exprs)) %in% tolower(genes_to_plot)] # fix this doesn't work
+
   genes_to_plot <- unique(genes_to_plot)
 
   
@@ -60,7 +63,7 @@ gene_grapher <- function(exprs, # expression dataframe (generated with df_extrac
   if(!is.null(clusters_to_plot)) {
     clusters_to_plot <- gsub("\\+", "\\\\+", clusters_to_plot) # Escape special characters for correct subsetting
     clusters_to_plot <- gsub("\\-", "\\\\-", clusters_to_plot)
-    exprs <- filter(exprs, str_detect(Cluster_id, regex(clusters_to_plot, ignore_case=T, comments = F)))
+    exprs <- filter(exprs, str_detect(Cluster, regex(clusters_to_plot, ignore_case=T, comments = F)))
     }
   
   # Subset cells that express markers of interest at any level (>0)
