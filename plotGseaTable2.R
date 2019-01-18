@@ -1,5 +1,5 @@
 plotGseaTable2 <- function (pathways, stats, fgseaRes, gseaParam = 1, colwidths = c(5, 
-                                                                  3, 0.8, 1.2, 1.2), plot_title = NULL) 
+                                                                  3, 0.8, 1.2, 1.2), plot_title = NULL, do.plot=T) 
 {
   require(fgsea)
   environment(plotGseaTable2) <- environment(plotGseaTable) 
@@ -42,6 +42,11 @@ plotGseaTable2 <- function (pathways, stats, fgseaRes, gseaParam = 1, colwidths 
                       "padj"), textGrob), unlist(ps, recursive = FALSE), list(nullGrob(), 
                                                                               rankPlot, nullGrob(), nullGrob(), nullGrob()))
   grobsToDraw <- rep(colwidths != 0, length(grobs)/length(colwidths))
-  grid.arrange(grobs = grobs[grobsToDraw], ncol = sum(colwidths != 0), widths = colwidths[colwidths != 0], top=plot_title)
+  plot_grob <- arrangeGrob(grobs = grobs[grobsToDraw], ncol = sum(colwidths != 0), widths = colwidths[colwidths != 0], top=plot_title)
+  
+  if(do.plot) {grid.draw(plot_grob)} else {plot_grob}
+  
+  
+  
 }
 

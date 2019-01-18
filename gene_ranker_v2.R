@@ -76,18 +76,14 @@ gene_ranker <- function(exprs = NULL, # Expression data frame (rows are cells, c
   
   
   # Report which cells are being analyzed
-  message(paste(dim(sample_df)[1], "cells with the following annotations are included in the 'sample' group (left side of GSEA plot)"))
-  message("\nSample:\n", 
-          paste(levels(droplevels(as.factor(sample_df$Sample))), collapse = ", "), "\n",
-          "\nSample clusters in analysis:\n", 
-          paste(levels(droplevels(as.factor(sample_df$Cluster))), collapse = ", "))
+  print(paste(dim(sample_df)[1], "cells with the following annotations are included in the 'sample' group (left side of GSEA plot)"))
+  print(paste("Sample:",paste(levels(droplevels(as.factor(sample_df$Sample))), collapse = ", ")))
+  print(paste("Sample clusters in analysis:", paste(levels(droplevels(as.factor(sample_df$Cluster))), collapse = ", ")))
   
   
-  message(paste(dim(reference_df)[1], "cells with the following annotations are included in the 'reference' group (right side of GSEA plot)"))
-  message("\nReference:\n", 
-          paste(levels(droplevels(as.factor(reference_df$Sample))), collapse = ", "), "\n",
-          "\nReference clusters in analysis:\n", 
-          paste(levels(droplevels(as.factor(reference_df$Cluster))), collapse = ", "))
+  print(paste(dim(reference_df)[1], "cells with the following annotations are included in the 'reference' group (right side of GSEA plot)"))
+  print(paste("Reference:", paste(levels(droplevels(as.factor(reference_df$Sample))), collapse = ", ")))
+  print(paste("Reference clusters in analysis:", paste(levels(droplevels(as.factor(reference_df$Cluster))), collapse = ", ")))
   
   
   
@@ -140,7 +136,7 @@ gene_ranker <- function(exprs = NULL, # Expression data frame (rows are cells, c
     
     if(colnames(sample_df) != colnames(reference_df)){
       
-      message("Different column (gene) names between sample and reference. Using shared genes for ranking")
+      print("Different column (gene) names between sample and reference. Using shared genes for ranking")
       
       shared <- intersect(colnames(sample_df), colnames(reference_df))
       

@@ -101,8 +101,10 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
       
     } else { plot_title = ""}
     
-    top_plotter(gsea_results = res, ranked_genes = ranked_genes, gene_set = gene_set,
-                top_n = top_n, gseaParam = gseaParam, plot_title=plot_title)
+    plot_grob <- top_plotter(gsea_results = res, ranked_genes = ranked_genes, gene_set = gene_set,
+                top_n = top_n, gseaParam = gseaParam, plot_title=plot_title, do.plot=F)
+    grid.draw(plot_grob)
+    
   } else {
     
     hits <- c(grep(plot_individual, res$pathway, ignore.case = T, value = T))
@@ -140,10 +142,11 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
         #   labs(title = hits[num]) +
         #   annotation_custom(grob)
         
-        plotEnrichment(pathway = gene_set[[hits[num]]], stats = ranked_genes) +
+        plot_grob <- plotEnrichment(pathway = gene_set[[hits[num]]], stats = ranked_genes) +
           labs(title = hits[num]) +
           annotate("text", x=x_pos, y=annot_ES/2, label = annot_text, colour = "red", size=4)+
           theme(plot.title = element_text(size=5, hjust = 0.5))
+        print(plot_grob)
         
       } else {
         
@@ -161,12 +164,13 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
         #        subtitle = plot_subtitle)+
         #   annotation_custom(grob)
         
-        plotEnrichment(pathway = gene_set[[hits[num]]], stats = ranked_genes) +
+        plot_grob <- plotEnrichment(pathway = gene_set[[hits[num]]], stats = ranked_genes) +
           labs(title = hits[num],
                subtitle = paste(sample_id, "vs", reference_id, plot_subtitle))+
           annotate("text" , x=x_pos, y=annot_ES/2, label = annot_text, colour = "red", size=4)+
           theme(plot.title = element_text(size=10, hjust = 0.5),
                 plot.subtitle = element_text(size=6, hjust = 0.5))
+        print(plot_grob)
         
       }
       
@@ -195,9 +199,10 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
         #   labs(title = hits) +
         #   annotation_custom(grob)
         
-        plotEnrichment(pathway = gene_set[[hits]], stats = ranked_genes) +
+        plot_grob <- plotEnrichment(pathway = gene_set[[hits]], stats = ranked_genes) +
           labs(title = hits) +
           annotate("text", x=x_pos, y=annot_ES/2, label = annot_text, colour = "red", size=4)
+        print(plot_grob)
         
       } else {
         
@@ -214,13 +219,13 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
         #        subtitle = plot_subtitle)+
         #   annotation_custom(grob)
         
-        plotEnrichment(pathway = gene_set[[hits]], stats = ranked_genes) +
+        plot_grob <- plotEnrichment(pathway = gene_set[[hits]], stats = ranked_genes) +
           labs(title = hits,
                subtitle = paste(sample_id, "vs", reference_id, plot_subtitle))+
           annotate("text", x=x_pos, y=annot_ES/2, label = annot_text, colour = "red", size=4)+
           theme(plot.title = element_text(size=10, hjust = 0.5),
                 plot.subtitle = element_text(size=6, hjust = 0.5))
-        
+        print(plot_grob)
       }
       
     }
@@ -234,14 +239,14 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
    sample_id  <-  str_replace_all(sample_id, "[:punct:]|[:space:]", "")
    reference_id <-   str_replace_all(reference_id, "[:punct:]|[:space:]", "")
     
-    arg_list <- list(samp_clu = sample_cluster, 
-                     ref_clu = reference_cluster, 
-                     samp_id = sample_id, 
-                     ref_id = reference_id,
-                     pos = paste(pos_marker, collapse = "."), 
-                     neg = paste(neg_marker, collapse = "."))
+    arg_list <- list(SAMPclus = sample_cluster, 
+                     REFclus = reference_cluster, 
+                     SAMPid = sample_id, 
+                     REFid = reference_id,
+                     POSmarker = paste(pos_marker, collapse = "."), 
+                     NEGmarker = paste(neg_marker, collapse = "."))
     
-    select_non_null <- !sapply(arg_list, function(x) {identical(x, character(0))})
+    select_non_null <- !sapply(arg_list, function(x) {identical(x, "")})
     select_non_null2 <- !sapply(arg_list, is.null)
     select_non_null <- as.logical(select_non_null * select_non_null2)
     
@@ -254,11 +259,11 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
       
     } else {
       
-      filename <- paste(names(arg_list[select_non_null]), arg_list[select_non_null], sep="_", collapse = " ")
-      filename <- paste0(filename, "_", append_to_filename, ".png")
+      filename <- paste(names(arg_list[select_non_null]), arg_list[select_non_null], sep="-", collapse = "___")
+      filename <- paste0(filename, "___", append_to_filename, ".png")
     }
     
-    ggsave(filename = filename, width = png_width, height = png_height, units = png_units)
+    ggsave(plot = plot_grob, filename = filename, width = png_width, height = png_height, units = png_units)
   
   }
   
