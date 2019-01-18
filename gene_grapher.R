@@ -16,7 +16,7 @@ gene_grapher <- function(exprs, # expression dataframe (generated with df_extrac
                          colors_to_use = NULL, # Default is rainbow palette. You can provide a character vector
                          show_stats = T, # Calculate and show statistics on graph?
                          comparisons = NULL, # Which stats to show. A list of character vectors (pair-wise)
-                         stat_method = c("t.test", "wilcox.test"), # Use parametric t-test or nonparametric wilcoxon test
+                         stat_method = c("wilcox.test", "t.test"), # Use parametric t-test or nonparametric wilcoxon test
                          p_adj_method = c("holm", "hochberg", "hommel", "bonferroni", "BH", "BY","fdr", "none"), # How to adjust p-values
                          save_pdf = T, # Save results in a pdf file in the workspace.
                          append_to_filename = "",
@@ -46,13 +46,9 @@ gene_grapher <- function(exprs, # expression dataframe (generated with df_extrac
   
   if(length(gene_not_found) > 0) {message(paste("Following genes are not found in data set: ", paste(gene_not_found, collapse = ", ")))}
   
+
   # # Match and correct capitalization of gene list
-  # genes_to_plot <- grep(genes_to_plot, colnames(exprs), ignore.case = T, value = T)
-  # 
-  # genes_to_plot <- genes_to_plot[genes_to_plot %in% colnames(exprs)]
-  
-  # # Match and correct capitalization of gene list
-  genes_to_plot <- colnames(exprs)[tolower(colnames(exprs)) %in% tolower(genes_to_plot)] # fix this doesn't work
+  genes_to_plot <- colnames(exprs)[tolower(colnames(exprs)) %in% tolower(genes_to_plot)]
 
   genes_to_plot <- unique(genes_to_plot)
 
@@ -61,9 +57,9 @@ gene_grapher <- function(exprs, # expression dataframe (generated with df_extrac
   
   # Subset clusters of interest
   if(!is.null(clusters_to_plot)) {
-    clusters_to_plot <- gsub("\\+", "\\\\+", clusters_to_plot) # Escape special characters for correct subsetting
-    clusters_to_plot <- gsub("\\-", "\\\\-", clusters_to_plot)
-    exprs <- filter(exprs, str_detect(Cluster, regex(clusters_to_plot, ignore_case=T, comments = F)))
+
+    exprs <- filter(exprs, Cluster %in% clusters_to_plot)
+    
     }
   
   # Subset cells that express markers of interest at any level (>0)
@@ -89,11 +85,9 @@ gene_grapher <- function(exprs, # expression dataframe (generated with df_extrac
   
   
   # Report which cells are being analyzed
-  message(paste(dim(exprs)[1], "cells with the following annotations will be plotted"))
-  message("\nSample:\n", 
-          paste(levels(droplevels(as.factor(exprs$Sample))), collapse = ", "), "\n",
-          "\nSample clusters in analysis:\n", 
-          paste(levels(droplevels(as.factor(exprs$Cluster))), collapse = ", "), "\n\n")
+  print((paste(dim(exprs)[1], "cells with the following annotations will be plotted")))
+  print(paste("Samples:", paste(levels(droplevels(as.factor(exprs$Sample))), collapse = ", ")))
+  print(paste("Clusters:", paste(levels(droplevels(as.factor(exprs$Cluster))), collapse = ", ")))
   
  
   omitted_genes <- character()

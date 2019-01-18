@@ -99,7 +99,7 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
       
       plot_title <- paste0(main_title,"\n", plot_subtitle)
       
-    }
+    } else { plot_title = ""}
     
     top_plotter(gsea_results = res, ranked_genes = ranked_genes, gene_set = gene_set,
                 top_n = top_n, gseaParam = gseaParam, plot_title=plot_title)
