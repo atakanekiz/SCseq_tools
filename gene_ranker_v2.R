@@ -49,7 +49,7 @@ gene_ranker <- function(exprs = NULL, # Expression data frame (rows are cells, c
   # Subset clusters of interest
   if(!is.null(reference_cluster)) {
 
-    reference_df <- filter(reference_df, Cluster %in% reference_cluster, ignore_case=T)
+    reference_df <- filter(reference_df, Cluster %in% reference_cluster)
     
     }
   
