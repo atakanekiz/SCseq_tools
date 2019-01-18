@@ -26,16 +26,14 @@ gene_ranker <- function(exprs = NULL, # Expression data frame (rows are cells, c
   if(!is.null(neg_marker)) {exprs <- filter_(exprs, paste(neg_marker , "== 0", collapse = " & "))}
   
   # Subset cells to serve as sample in comparison (sample vs ref comparison i.e. left side of the GSEA plots later on)
-  sample_df <- filter(exprs, str_detect(Sample, regex(sample_id, ignore_case=T, comments=F)))
+  sample_df <- filter(exprs, Sample %in% sample_id)
   
 
   
   # Subset clusters of interest
   if(!is.null(sample_cluster)) {
     
-    sample_cluster <- gsub("\\+", "\\\\+", sample_cluster) # Escape special characters for correct subsetting
-    sample_cluster <- gsub("\\-", "\\\\-", sample_cluster)
-    sample_df <- filter(sample_df, str_detect(Cluster, regex(sample_cluster, ignore_case=T, comments = F)))
+    sample_df <- filter(sample_df, Cluster %in% sample_cluster)
     
     }
   
@@ -43,16 +41,16 @@ gene_ranker <- function(exprs = NULL, # Expression data frame (rows are cells, c
   
   
   # Subset cells to serve as reference in comparison (sample vs ref comparison i.e. right side of the GSEA plots later on)
-  reference_df <- filter(exprs, str_detect(Sample, regex(reference_id, ignore_case=T)))
+  reference_df <- filter(exprs, Sample %in% reference_id)
   
   
 
   
   # Subset clusters of interest
   if(!is.null(reference_cluster)) {
-    reference_cluster <- gsub("\\+", "\\\\+", reference_cluster) # Escape special characters for correct subsetting
-    reference_cluster <- gsub("\\-", "\\\\-", reference_cluster)
-    reference_df <- filter(reference_df, str_detect(Cluster, regex(reference_cluster, ignore_case=T)))
+
+    reference_df <- filter(reference_df, Cluster %in% reference_cluster, ignore_case=T)
+    
     }
   
 
