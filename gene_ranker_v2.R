@@ -57,22 +57,50 @@ gene_ranker <- function(exprs = NULL, # Expression data frame (rows are cells, c
   if(method == "mwt"){
     
     require(mwt)
+    require(BiocGenerics)
     
+    discard_from_sample <- as.logical(colSums(sample_df == 0, na.rm = T))
+    discard_from_ref <- as.logical(colSums(reference_df == 0, na.rm = T))
+    discard_from_both <- discard_from_sample | discard_from_ref
+    sample_df <- sample_df[,!discard_from_both]
+    reference_df <- reference_df[,!discard_from_both]
+   
     sample_df <- add_column(sample_df, Comparison = "Sample", .after = 0)
+    
     reference_df <-add_column(reference_df, Comparison="Reference", .after=0)
+    
+    
+    
     
     trimmed_df <- rbind(sample_df, reference_df)
     group_colnames <- as.factor(trimmed_df$Comparison)
     trimmed_df <- trimmed_df %>%
-      select(-Sample, -Cluster, -Cell_id, -Comparison)%>%
+      dplyr::select(-Sample, -Cluster, -Cell_id, -Comparison)%>%
       t()
     
     colnames(trimmed_df) <- group_colnames
     
+    
+  
     mwt_results <- mwt(trimmed_df, grp = group_colnames)
     
-  }
+  } else {
   
+    # Get rid of unnecessary columns
+    sample_df <- sample_df[,!colnames(sample_df) %in% c("Sample", "Cluster", "Cell_id")]
+    reference_df <- reference_df[,!colnames(reference_df) %in% c("Sample", "Cluster", "Cell_id")]
+    
+    sample_mean <- colMeans(sample_df)
+    sample_sd <- apply(sample_df, MARGIN = 2, FUN = sd)
+    sample_var <- apply(sample_df, MARGIN = 2, FUN = var)
+    sample_n <- dim(sample_df)[1]
+    
+    reference_mean <- colMeans(reference_df)
+    reference_sd <- apply(reference_df, MARGIN = 2, FUN = sd)
+    reference_var <- apply(reference_df, MARGIN = 2, FUN = var)
+    reference_n <- dim(reference_df)[1]
+    
+  }
   
   
   # Report which cells are being analyzed
@@ -87,20 +115,10 @@ gene_ranker <- function(exprs = NULL, # Expression data frame (rows are cells, c
   
   
   
-  # Get rid of unnecessary columns
-  sample_df <- sample_df[,!colnames(sample_df) %in% c("Sample", "Cluster", "Cell_id")]
-  reference_df <- reference_df[,!colnames(reference_df) %in% c("Sample", "Cluster", "Cell_id")]
+
   
   
-  sample_mean <- colMeans(sample_df)
-  sample_sd <- apply(sample_df, MARGIN = 2, FUN = sd)
-  sample_var <- apply(sample_df, MARGIN = 2, FUN = var)
-  sample_n <- dim(sample_df)[1]
-  
-  reference_mean <- colMeans(reference_df)
-  reference_sd <- apply(reference_df, MARGIN = 2, FUN = sd)
-  reference_var <- apply(reference_df, MARGIN = 2, FUN = var)
-  reference_n <- dim(reference_df)[1]
+
   
   
   
@@ -127,7 +145,7 @@ gene_ranker <- function(exprs = NULL, # Expression data frame (rows are cells, c
   } else if(method == "mwt"){
     
     ranking <- mwt_results$MWT
-    names(ranking) <- rownames(trimmed_df)
+    # names(ranking) <- rownames(trimmed_df) #not needed?
     
   } else if (method == "bws"){
     
@@ -157,10 +175,9 @@ gene_ranker <- function(exprs = NULL, # Expression data frame (rows are cells, c
       
       ranking[i] <- bws_stat(sample_gene, reference_gene)
       
-      k <- k+1
     }
     
-  } else {error('Select one of the following statistical tests: s2n, ttest, difference, ratio, welch, mwt, bws')}
+  } else {stop('Select one of the following statistical tests: s2n, ttest, difference, ratio, welch, mwt, bws')}
   
   
   ranking <- subset(ranking, c(!is.na(ranking) & !is.infinite(ranking)))

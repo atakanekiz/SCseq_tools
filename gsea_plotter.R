@@ -265,7 +265,7 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
     
     ggsave(plot = plot_grob, filename = filename, width = png_width, height = png_height, units = png_units)
   
-  }
+  } else grid.arrange(plot_grob)
   
 }
 
