@@ -20,7 +20,7 @@ gene_grapher <- function(exprs, # expression dataframe (generated with df_extrac
                          show_stats = T, # Calculate and show statistics on graph?
                          comparisons = NULL, # Which stats to show. A list of character vectors (pair-wise). Default plots all comparisons.
                          stat_method = c("wilcox.test", "t.test"), # Use parametric t-test or nonparametric wilcoxon test
-                         p_hod = c("holm", "hochberg", "hommel", "bonferroni", "BH", "BY","fdr", "none"), # How to adjust p-values
+                         p_adj_method = c("holm", "hochberg", "hommel", "bonferroni", "BH", "BY","fdr", "none"), # How to adjust p-values
                          y_expand_low = 1.75, # expand low y-limit as a multiplicative factor (see mult argument of expand_scale)
                          y_expand_high = 1.75, # expand high y-limit as a multiplicative factor (see mult argument of expand_scale)
                          pval_y_offset = 5/6, # Offset factor for determining y-coordinate of pvalues. Is a multiplicative factor of y_max
