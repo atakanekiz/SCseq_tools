@@ -7,21 +7,21 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
                         reference_cluster = NULL, # Cell clusters to include in analysis for the reference subset
                         method = "s2n", #"ttest", "difference", "ratio", "welch", "mwt", "bws"), # Method for ranking the genes. For MWT, see PMID: 18344518
                         gene_set = "hallmark", #"go", "curated", "immune", "motif", "all", "custom"), 
-                        nperm = 10000, 
-                        minSize = 50, 
-                        maxSize = 500,
-                        top_n = 10, 
-                        gseaParam = 1, 
-                        plot_individual = NULL,
-                        append_title = F,
-                        top_plots_title = T,
-                        seed = 123,
+                        nperm = 10000, # number of permutations performed for calculations
+                        minSize = 50, # minimum number of genes in a list to be considered in enrichment
+                        maxSize = 500, # maximum number of genes in a list to be considered in enrichment
+                        top_n = 10, # Report top enrichment results
+                        gseaParam = 1, # Changes the size of gene bars in summary plots
+                        plot_individual = NULL, #
+                        append_title = F, # add groups in comparison to as subtitle in individual plots
+                        top_plots_title = T, # Plotting title to summarize the groups in comparison
+                        seed = 123, # random seed
                         keep_results = T, # Save enrichment results as a global object?
-                        save_png = T,
-                        png_units = "in",
-                        png_width = 4,
+                        save_png = F, 
+                        png_units = "in", 
+                        png_width = 4, # good size for individual plots. For summary table increase the size
                         png_height = 3,
-                        append_to_filename = ""
+                        append_to_filename = "" # add a custom string to the png filename
                         ){
   
   set.seed(seed)
@@ -103,7 +103,8 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
     
     plot_grob <- top_plotter(gsea_results = res, ranked_genes = ranked_genes, gene_set = gene_set,
                 top_n = top_n, gseaParam = gseaParam, plot_title=plot_title, do.plot=F)
-    grid.draw(plot_grob)
+    grid.arrange(plot_grob)
+    
     
   } else {
     
@@ -265,7 +266,7 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
     
     ggsave(plot = plot_grob, filename = filename, width = png_width, height = png_height, units = png_units)
   
-  } else grid.arrange(plot_grob)
+  } #else grid.arrange(plot_grob)
   
 }
 
