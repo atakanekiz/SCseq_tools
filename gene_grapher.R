@@ -10,14 +10,20 @@ gene_grapher <- function(exprs, # expression dataframe (generated with df_extrac
                          neg_marker = NULL, # select cells not expressing these markers. Can provide a character vector of length 1 or more
                          plot_type = c("box", "bar", "violin"), # the type of plot to be generated
                          add_jitter = T, # Add transparent jitter data points
+                         add_point = F, # Add points (aligned) as an alternative to jitter
+                         point_size = 0.2, # size of the jitter 
+                         point_alpha = 0.2, # transparency of the jitter
                          add_mean = T, # Add a red colored point indicating mean value
                          add_median = T, # Add a blue colors point indicating median value
                          sort_plots = F, # Alphabetical ordering of plots based on gene name
                          colors_to_use = NULL, # Default is rainbow palette. You can provide a character vector
                          show_stats = T, # Calculate and show statistics on graph?
-                         comparisons = NULL, # Which stats to show. A list of character vectors (pair-wise)
+                         comparisons = NULL, # Which stats to show. A list of character vectors (pair-wise). Default plots all comparisons.
                          stat_method = c("wilcox.test", "t.test"), # Use parametric t-test or nonparametric wilcoxon test
-                         p_adj_method = c("holm", "hochberg", "hommel", "bonferroni", "BH", "BY","fdr", "none"), # How to adjust p-values
+                         p_hod = c("holm", "hochberg", "hommel", "bonferroni", "BH", "BY","fdr", "none"), # How to adjust p-values
+                         y_expand_low = 1.75, # expand low y-limit as a multiplicative factor (see mult argument of expand_scale)
+                         y_expand_high = 1.75, # expand high y-limit as a multiplicative factor (see mult argument of expand_scale)
+                         pval_y_offset = 5/6, # Offset factor for determining y-coordinate of pvalues. Is a multiplicative factor of y_max
                          save_pdf = T, # Save results in a pdf file in the workspace.
                          append_to_filename = "",
                          output_plot = F, # Set to TRUE if you'd like to show graph in RMD or viewer
@@ -142,8 +148,11 @@ gene_grapher <- function(exprs, # expression dataframe (generated with df_extrac
     y_max <- exprs %>% 
       pull(gene) %>% max(na.rm = TRUE) 
     
+    y_min <- exprs %>% 
+      pull(gene) %>% min(na.rm = TRUE) 
     
-    p_value_y_coord <- rep(y_max*5/6, nrow(stat_test))
+    
+    p_value_y_coord <- rep(y_max*pval_y_offset, nrow(stat_test))
     
     step_increase <- (1:nrow(stat_test))*(y_max/5)
     p_value_y_coord <- p_value_y_coord + step_increase
@@ -200,7 +209,9 @@ gene_grapher <- function(exprs, # expression dataframe (generated with df_extrac
       
     } else {stop("Select one of the following as graph type: 'bar', 'box', 'violin'")}
     
-    if(add_jitter == T){ p <- ggadd(p, add = "jitter", alpha=0.2, size = 0.2) }
+    if(add_jitter == T){ p <- ggadd(p, add = "jitter", alpha=point_alpha, size = point_size) }
+    
+    if(add_point == T){ p <- ggadd(p, add = "point", alpha=point_alpha, size = point_size) }
     
     if(add_mean == T){ p <- ggadd(p, add = "mean", color = "red", size = 0.3)}
     
@@ -209,9 +220,11 @@ gene_grapher <- function(exprs, # expression dataframe (generated with df_extrac
     if(show_stats == T){ tryCatch(error=function(x){},
                                   
                                   {
-      p <- p + expand_limits(y=y_max*1.75) +
-        stat_pvalue_manual(stat_test, label = "p.signif", size = 2.5)
-      
+                                    
+                                    p <- p + 
+                                      scale_y_continuous(expand = expand_scale(mult = c(y_expand_low, y_expand_high))) +
+                                      stat_pvalue_manual(stat_test, label = "p.signif", size = 3.5)                      
+                                    
                                   })
     }
     
