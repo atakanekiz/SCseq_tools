@@ -85,6 +85,19 @@ gene_ranker <- function(exprs = NULL, # Expression data frame (rows are cells, c
     mwt_results <- mwt(trimmed_df, grp = group_colnames)
     
   } else {
+    
+    
+    # Report which cells are being analyzed
+    print(paste(dim(sample_df)[1], "cells with the following annotations are included in the 'sample' group (left side of GSEA plot)"))
+    print(paste("Sample:",paste(levels(droplevels(as.factor(sample_df$Sample))), collapse = ", ")))
+    print(paste("Sample clusters in analysis:", paste(levels(droplevels(as.factor(sample_df$Cluster))), collapse = ", ")))
+    
+    
+    print(paste(dim(reference_df)[1], "cells with the following annotations are included in the 'reference' group (right side of GSEA plot)"))
+    print(paste("Reference:", paste(levels(droplevels(as.factor(reference_df$Sample))), collapse = ", ")))
+    print(paste("Reference clusters in analysis:", paste(levels(droplevels(as.factor(reference_df$Cluster))), collapse = ", ")))
+    
+    
   
     # Get rid of unnecessary columns
     sample_df <- sample_df[,!colnames(sample_df) %in% c("Sample", "Cluster", "Cell_id")]
@@ -103,15 +116,7 @@ gene_ranker <- function(exprs = NULL, # Expression data frame (rows are cells, c
   }
   
   
-  # Report which cells are being analyzed
-  print(paste(dim(sample_df)[1], "cells with the following annotations are included in the 'sample' group (left side of GSEA plot)"))
-  print(paste("Sample:",paste(levels(droplevels(as.factor(sample_df$Sample))), collapse = ", ")))
-  print(paste("Sample clusters in analysis:", paste(levels(droplevels(as.factor(sample_df$Cluster))), collapse = ", ")))
-  
-  
-  print(paste(dim(reference_df)[1], "cells with the following annotations are included in the 'reference' group (right side of GSEA plot)"))
-  print(paste("Reference:", paste(levels(droplevels(as.factor(reference_df$Sample))), collapse = ", ")))
-  print(paste("Reference clusters in analysis:", paste(levels(droplevels(as.factor(reference_df$Cluster))), collapse = ", ")))
+
   
   
   
