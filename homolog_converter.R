@@ -5,6 +5,7 @@ homolog_converter <- function(input_df, # data frame containing genes in rows, s
   require(biomaRt)
   require(tibble)
   require(data.table)
+  require(dplyr)
   
   # input_df <- dat
   
