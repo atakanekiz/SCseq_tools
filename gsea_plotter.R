@@ -74,7 +74,7 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
                               reference_cluster = reference_cluster, 
                               method = method)
   
-  # assign("ranked_genes", ranked_genes, .GlobalEnv)
+  if(keep_results) assign("ranked_genes", ranked_genes, .GlobalEnv)
   # assign("gene_set", gene_set, .GlobalEnv)
   
   
