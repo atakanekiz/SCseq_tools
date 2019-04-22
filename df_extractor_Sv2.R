@@ -1,5 +1,3 @@
-# Suitable to extract data frame from Seurat v3 object
-
 # Make a function to create gene expression data frame to be used in GSEA calculations and gene plotting
 ###################################################################################################################################################################
 
@@ -17,11 +15,11 @@ df_extractor <- function(seurat_obj,
   
   if(use_raw == F){
     
-    exprs <- as.data.frame(as.matrix(GetAssayData(object = seurat_obj)))
+    exprs <- as.data.frame(as.matrix(seurat_obj@data))
     
   } else {
     
-    exprs <- as.data.frame(as.matrix(GetAssayData(object = seurat_obj, slot = "counts")))
+    exprs <- as.data.frame(as.matrix(seurat_obj@raw.data))
     }
   
   
