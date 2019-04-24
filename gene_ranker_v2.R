@@ -75,7 +75,7 @@ gene_ranker <- function(exprs = NULL, # Expression data frame (rows are cells, c
     trimmed_df <- rbind(sample_df, reference_df)
     group_colnames <- as.factor(trimmed_df$Comparison)
     trimmed_df <- trimmed_df %>%
-      dplyr::select(-Sample, -Cluster, -Cell_id, -Comparison)%>%
+      dplyr::select(-Sample, -Cluster, -Comparison)%>%
       t()
     
     colnames(trimmed_df) <- group_colnames
@@ -100,8 +100,8 @@ gene_ranker <- function(exprs = NULL, # Expression data frame (rows are cells, c
     
   
     # Get rid of unnecessary columns
-    sample_df <- sample_df[,!colnames(sample_df) %in% c("Sample", "Cluster", "Cell_id")]
-    reference_df <- reference_df[,!colnames(reference_df) %in% c("Sample", "Cluster", "Cell_id")]
+    sample_df <- sample_df[,!colnames(sample_df) %in% c("Sample", "Cluster")]
+    reference_df <- reference_df[,!colnames(reference_df) %in% c("Sample", "Cluster")]
     
     sample_mean <- colMeans(sample_df)
     sample_sd <- apply(sample_df, MARGIN = 2, FUN = sd)

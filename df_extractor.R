@@ -80,7 +80,7 @@ df_extractor <- function(seurat_obj,
   
   for(i in names(metadata_to_extract)){
     
-      df <- add_column(df, !!i := seurat_obj[[metadata_to_extract[[i]]]], .after = 0)
+      df <- add_column(df, !!i := seurat_obj[[metadata_to_extract[[i]]]][[1]], .after = 0)
   }
   
   df
