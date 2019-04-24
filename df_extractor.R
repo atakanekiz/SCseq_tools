@@ -74,6 +74,7 @@ df_extractor <- function(seurat_obj,
  
   if(is.null(names(metadata_to_extract))) {
     
+    warning("'metadata_to_extract' argument is an unnamed vector. Column names are created automatically. To ensure correct functioning of other downstream functions, ensure the column names are appropriate.")
     names(metadata_to_extract) <- metadata_to_extract
     
   }
