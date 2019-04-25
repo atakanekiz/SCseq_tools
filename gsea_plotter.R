@@ -1,28 +1,29 @@
 gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, columns are genes and metadata)
-                        pos_marker = NULL, # Genes to positively gate cells (cells expressing these markers will be subsetted)
-                        neg_marker = NULL, # Genes to negatively gate cells (cells expressing these markers will be discarded)
-                        sample_id, # Which cells will be selected as 'sample' (ie, the direction of rank ordering. Regex based string recognition. Make sure you escape special characters such as parantheses
-                        sample_cluster = NULL, # Cell clusters to include in analysis for the sample subset
-                        reference_id, # Which cells will be selected as 'reference' (ie, the direction of rank ordering)
-                        reference_cluster = NULL, # Cell clusters to include in analysis for the reference subset
-                        method = "s2n", #"ttest", "difference", "ratio", "welch", "mwt", "bws"), # Method for ranking the genes. For MWT, see PMID: 18344518
-                        gene_set = "hallmark", #"go", "curated", "immune", "motif", "all", "custom"), 
-                        nperm = 10000, # number of permutations performed for calculations
-                        minSize = 50, # minimum number of genes in a list to be considered in enrichment
-                        maxSize = 500, # maximum number of genes in a list to be considered in enrichment
-                        top_n = 10, # Report top enrichment results
-                        gseaParam = 1, # Changes the size of gene bars in summary plots
-                        plot_individual = NULL, #
-                        append_title = F, # add groups in comparison to as subtitle in individual plots
-                        top_plots_title = T, # Plotting title to summarize the groups in comparison
-                        seed = 123, # random seed
-                        keep_results = T, # Save enrichment results as a global object?
-                        save_png = F, 
-                        png_units = "in", 
-                        png_width = 4, # good size for individual plots. For summary table increase the size
-                        png_height = 3,
-                        append_to_filename = "" # add a custom string to the png filename
-                        ){
+                         preranked_genes = NULL, # Pass a named vector preranked externally. Useful for using this function with previously analyzed RNAseq data  
+                         pos_marker = NULL, # Genes to positively gate cells (cells expressing these markers will be subsetted)
+                         neg_marker = NULL, # Genes to negatively gate cells (cells expressing these markers will be discarded)
+                         sample_id, # Which cells will be selected as 'sample' (ie, the direction of rank ordering. Regex based string recognition. Make sure you escape special characters such as parantheses
+                         sample_cluster = NULL, # Cell clusters to include in analysis for the sample subset
+                         reference_id, # Which cells will be selected as 'reference' (ie, the direction of rank ordering)
+                         reference_cluster = NULL, # Cell clusters to include in analysis for the reference subset
+                         method = "s2n", #"ttest", "difference", "ratio", "welch", "mwt", "bws"), # Method for ranking the genes. For MWT, see PMID: 18344518
+                         gene_set = "hallmark", #"go", "curated", "immune", "motif", "all", "custom"), 
+                         nperm = 10000, # number of permutations performed for calculations
+                         minSize = 50, # minimum number of genes in a list to be considered in enrichment
+                         maxSize = 500, # maximum number of genes in a list to be considered in enrichment
+                         top_n = 10, # Report top enrichment results
+                         gseaParam = 1, # Changes the size of gene bars in summary plots
+                         plot_individual = NULL, #
+                         append_title = F, # add groups in comparison to as subtitle in individual plots
+                         top_plots_title = T, # Plotting title to summarize the groups in comparison
+                         seed = 123, # random seed
+                         keep_results = T, # Save enrichment results as a global object?
+                         save_png = F, 
+                         png_units = "in", 
+                         png_width = 4, # good size for individual plots. For summary table increase the size
+                         png_height = 3,
+                         append_to_filename = "" # add a custom string to the png filename
+){
   
   set.seed(seed)
   
@@ -39,52 +40,58 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
   if(gene_set == "hallmark"){
     
     gene_set <- hallmark
-  
+    
   } else if(gene_set == "go"){
     
     gene_set <- go
-      
+    
   } else if(gene_set == "curated"){
     
     gene_set <- curated
-      
+    
   } else if(gene_set == "immune"){
     
     gene_set <- immune
-      
+    
   } else if(gene_set == "motif"){
     
     gene_set <- motif
-      
+    
   } else if(gene_set == "all"){
     
     gene_set <- all
-      
+    
   } else {gene_set = gene_set} # can pass a named list composing of genes as character vectors in each list element
-
+  
   if(is.null(reference_cluster)) {reference_cluster <- sample_cluster} # Specify only sample_cluster for subsetting on the same clusters in sample and reference
   
-  
-  ranked_genes <- gene_ranker(exprs = exprs,
-                              pos_marker = pos_marker,
-                              neg_marker = neg_marker,
-                              sample_id = sample_id, 
-                              sample_cluster = sample_cluster,
-                              reference_id = reference_id,
-                              reference_cluster = reference_cluster, 
-                              method = method)
+  if(!is.null(preranked_genes)) {
+    
+    ranked_genes = preranked_genes
+    
+  } else {
+    
+    ranked_genes <- gene_ranker(exprs = exprs,
+                                pos_marker = pos_marker,
+                                neg_marker = neg_marker,
+                                sample_id = sample_id, 
+                                sample_cluster = sample_cluster,
+                                reference_id = reference_id,
+                                reference_cluster = reference_cluster, 
+                                method = method)
+  }
   
   if(keep_results) assign("ranked_genes", ranked_genes, .GlobalEnv)
   # assign("gene_set", gene_set, .GlobalEnv)
   
   
-
+  
   
   res <- fgsea(pathways = gene_set, stats = ranked_genes, 
                nperm = nperm, minSize = minSize, maxSize = maxSize)
   
   if(keep_results) assign("gsea_res", res, .GlobalEnv)
-
+  
   if (is.null(plot_individual)) {
     
     if(top_plots_title == T) {
@@ -93,7 +100,7 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
       select_non_null <- !sapply(arg_list, function(x) {identical(x, "")})
       
       
-     
+      
       main_title <- paste(sample_id, "vs", reference_id)
       plot_subtitle <- paste(names(arg_list[select_non_null]), arg_list[select_non_null],  sep=": ", collapse = "__")
       
@@ -102,7 +109,7 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
     } else { plot_title = ""}
     
     plot_grob <- top_plotter(gsea_results = res, ranked_genes = ranked_genes, gene_set = gene_set,
-                top_n = top_n, gseaParam = gseaParam, plot_title=plot_title, do.plot=F)
+                             top_n = top_n, gseaParam = gseaParam, plot_title=plot_title, do.plot=F)
     grid.arrange(plot_grob)
     
     
@@ -157,7 +164,7 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
         select_non_null <- as.logical(select_non_null * select_non_null2)
         
         plot_subtitle <- paste(names(arg_list[select_non_null]), arg_list[select_non_null], sep=": ", collapse = "__")
-
+        
         
         
         # plotEnrichment(pathway = gene_set[[hits[num]]], stats = ranked_genes) +
@@ -235,10 +242,10 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
   
   if(save_png == T){
     
-   sample_cluster <- str_replace_all(sample_cluster, "[:punct:]|[:space:]", "")
-   reference_cluster <-  str_replace_all(reference_cluster, "[:punct:]|[:space:]", "")
-   sample_id  <-  str_replace_all(sample_id, "[:punct:]|[:space:]", "")
-   reference_id <-   str_replace_all(reference_id, "[:punct:]|[:space:]", "")
+    sample_cluster <- str_replace_all(sample_cluster, "[:punct:]|[:space:]", "")
+    reference_cluster <-  str_replace_all(reference_cluster, "[:punct:]|[:space:]", "")
+    sample_id  <-  str_replace_all(sample_id, "[:punct:]|[:space:]", "")
+    reference_id <-   str_replace_all(reference_id, "[:punct:]|[:space:]", "")
     
     arg_list <- list(SAMPclus = sample_cluster, 
                      REFclus = reference_cluster, 
@@ -251,7 +258,7 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
     select_non_null2 <- !sapply(arg_list, is.null)
     select_non_null <- as.logical(select_non_null * select_non_null2)
     
-
+    
     
     
     if(sum(select_non_null) == 0) {
@@ -265,7 +272,7 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
     }
     
     ggsave(plot = plot_grob, filename = filename, width = png_width, height = png_height, units = png_units)
-  
+    
   } #else grid.arrange(plot_grob)
   
 }
