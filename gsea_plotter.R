@@ -2,9 +2,9 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
                          preranked_genes = NULL, # Pass a named vector preranked externally. Useful for using this function with previously analyzed RNAseq data  
                          pos_marker = NULL, # Genes to positively gate cells (cells expressing these markers will be subsetted)
                          neg_marker = NULL, # Genes to negatively gate cells (cells expressing these markers will be discarded)
-                         sample_id, # Which cells will be selected as 'sample' (ie, the direction of rank ordering. Regex based string recognition. Make sure you escape special characters such as parantheses
+                         sample_id = NULL, # Which cells will be selected as 'sample' (ie, the direction of rank ordering. Regex based string recognition. Make sure you escape special characters such as parantheses
                          sample_cluster = NULL, # Cell clusters to include in analysis for the sample subset
-                         reference_id, # Which cells will be selected as 'reference' (ie, the direction of rank ordering)
+                         reference_id = NULL, # Which cells will be selected as 'reference' (ie, the direction of rank ordering)
                          reference_cluster = NULL, # Cell clusters to include in analysis for the reference subset
                          method = "s2n", #"ttest", "difference", "ratio", "welch", "mwt", "bws"), # Method for ranking the genes. For MWT, see PMID: 18344518
                          gene_set = "hallmark", #"go", "curated", "immune", "motif", "all", "custom"), 
@@ -22,7 +22,8 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
                          png_units = "in", 
                          png_width = 4, # good size for individual plots. For summary table increase the size
                          png_height = 3,
-                         append_to_filename = "" # add a custom string to the png filename
+                         append_to_filename = "", # add a custom string to the png filename
+                         verbose=T # Report cells numbers and cluster belongings in analysis
 ){
   
   set.seed(seed)
@@ -31,6 +32,7 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
   require(dplyr)
   require(grid)
   require(ggplot2) 
+  require(stats)
   
   # source("gene_ranker_v2.R")
   # source("top_plotter.R")
@@ -78,7 +80,8 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
                                 sample_cluster = sample_cluster,
                                 reference_id = reference_id,
                                 reference_cluster = reference_cluster, 
-                                method = method)
+                                method = method,
+                                verbose=verbose)
   }
   
   if(keep_results) assign("ranked_genes", ranked_genes, .GlobalEnv)

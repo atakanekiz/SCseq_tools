@@ -11,8 +11,8 @@ gene_ranker <- function(exprs = NULL, # Expression data frame (rows are cells, c
                         reference_id, # Which cells will be selected as 'reference' (ie, the direction of rank ordering)
                         reference_cluster = NULL, # Cell clusters to include in analysis for the reference subset
                         method = "s2n", # can also take the following values ("ttest", "difference", "ratio", "welch", "mwt", "bws"), # Method for ranking the genes. For MWT, see PMID: 18344518  
-                        save_ranked_object = F # Set it to TRUE if you want to assign a global variable for ranking data
-                        ){
+                        save_ranked_object = F, # Set it to TRUE if you want to assign a global variable for ranking data
+                        verbose=T){
   
   require(dplyr)
   require(stringr)
@@ -87,6 +87,8 @@ gene_ranker <- function(exprs = NULL, # Expression data frame (rows are cells, c
   } else {
     
     
+    if(verbose){
+    
     # Report which cells are being analyzed
     print(paste(dim(sample_df)[1], "cells with the following annotations are included in the 'sample' group (left side of GSEA plot)"))
     print(paste("Sample:",paste(levels(droplevels(as.factor(sample_df$Sample))), collapse = ", ")))
@@ -97,7 +99,7 @@ gene_ranker <- function(exprs = NULL, # Expression data frame (rows are cells, c
     print(paste("Reference:", paste(levels(droplevels(as.factor(reference_df$Sample))), collapse = ", ")))
     print(paste("Reference clusters in analysis:", paste(levels(droplevels(as.factor(reference_df$Cluster))), collapse = ", ")))
     
-    
+    }
   
     # Get rid of unnecessary columns
     sample_df <- sample_df[,!colnames(sample_df) %in% c("Sample", "Cluster")]
