@@ -23,8 +23,11 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
                          png_width = 4, # good size for individual plots. For summary table increase the size
                          png_height = 3,
                          append_to_filename = "", # add a custom string to the png filename
-                         verbose=T # Report cells numbers and cluster belongings in analysis
-){
+                         verbose=T, # Report cells numbers and cluster belongings in analysis
+                         annot_text_color = "black", # color of annotation text
+                         annot_text_size = 4, # size of annotation text
+                         annot_text_fontface = 2,  # fontface type of annotation text (1,2,3,4, plain-bold-italic-bold and italic)
+                         ){
   
   set.seed(seed)
   
@@ -155,7 +158,7 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
         
         plot_grob <- plotEnrichment(pathway = gene_set[[hits[num]]], stats = ranked_genes) +
           labs(title = hits[num]) +
-          annotate("text", x=x_pos, y=annot_ES/2, label = annot_text, colour = "red", size=4)+
+          annotate("text", x=x_pos, y=annot_ES/2, label = annot_text, colour = annot_text_color, size=annot_text_size, fontface=annot_text_fontface)+
           theme(plot.title = element_text(size=5, hjust = 0.5))
         print(plot_grob)
         
