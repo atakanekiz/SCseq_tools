@@ -26,7 +26,7 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
                          verbose=T, # Report cells numbers and cluster belongings in analysis
                          annot_text_color = "black", # color of annotation text
                          annot_text_size = 4, # size of annotation text
-                         annot_text_fontface = 2,  # fontface type of annotation text (1,2,3,4, plain-bold-italic-bold and italic)
+                         annot_text_fontface = 2  # fontface type of annotation text (1,2,3,4, plain-bold-italic-bold and italic)
                          ){
   
   set.seed(seed)
@@ -181,7 +181,7 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
         plot_grob <- plotEnrichment(pathway = gene_set[[hits[num]]], stats = ranked_genes) +
           labs(title = hits[num],
                subtitle = paste(sample_id, "vs", reference_id, plot_subtitle))+
-          annotate("text" , x=x_pos, y=annot_ES/2, label = annot_text, colour = "red", size=4)+
+          annotate("text", x=x_pos, y=annot_ES/2, label = annot_text, colour = annot_text_color, size=annot_text_size, fontface=annot_text_fontface)+
           theme(plot.title = element_text(size=10, hjust = 0.5),
                 plot.subtitle = element_text(size=6, hjust = 0.5))
         print(plot_grob)
@@ -215,7 +215,7 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
         
         plot_grob <- plotEnrichment(pathway = gene_set[[hits]], stats = ranked_genes) +
           labs(title = hits) +
-          annotate("text", x=x_pos, y=annot_ES/2, label = annot_text, colour = "red", size=4)
+          annotate("text", x=x_pos, y=annot_ES/2, label = annot_text, colour = annot_text_color, size=annot_text_size, fontface=annot_text_fontface)
         print(plot_grob)
         
       } else {
@@ -236,7 +236,7 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
         plot_grob <- plotEnrichment(pathway = gene_set[[hits]], stats = ranked_genes) +
           labs(title = hits,
                subtitle = paste(sample_id, "vs", reference_id, plot_subtitle))+
-          annotate("text", x=x_pos, y=annot_ES/2, label = annot_text, colour = "red", size=4)+
+          annotate("text", x=x_pos, y=annot_ES/2, label = annot_text, colour = annot_text_color, size=annot_text_size, fontface=annot_text_fontface)+
           theme(plot.title = element_text(size=10, hjust = 0.5),
                 plot.subtitle = element_text(size=6, hjust = 0.5))
         print(plot_grob)
