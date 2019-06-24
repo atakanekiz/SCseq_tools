@@ -1,16 +1,19 @@
+# v5 ====> copied from v4 and v3
+# setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+
 CIPR <- function(input_dat, 
-                 comp_method = "dot_product",
-                 reference = "immgen",
-                 custom_ref_dat_path = NULL,
-                 custom_ref_annot_path = NULL,
-                 plot_ind = F, 
-                 plot_top = T, 
-                 top_num = 5, 
-                 save_png = F, 
-                 global_plot_obj = T,
-                 global_results_obj = T){
+                   comp_method = "logfc_dot_product",
+                   reference = "immgen",
+                   custom_ref_dat_path = NULL,
+                   custom_ref_annot_path = NULL,
+                   plot_ind = F, 
+                   plot_top = T, 
+                   top_num = 5, 
+                   save_png = F, 
+                   global_plot_obj = T,
+                   global_results_obj = T,
+                   update_ref = T){
   
-  # adapted from v4
   
   suppressMessages({
     require(ggpubr)
@@ -30,16 +33,21 @@ CIPR <- function(input_dat,
   # Convert gene symbols to lower case letters to allow mouse-vs-human comparisons
   input_dat[,gene_column] <- tolower(input_dat[,gene_column])
   
+  input_dat <- input_dat[!duplicated(input_dat[,gene_column]), ]
+  
+  
+  if(update_ref == T){
+  
   if(reference == "immgen"){
     
     message("Reading ImmGen (v1+v2) reference data")
     
     # Read reference dataset
-    ref_log <- readRDS(url("https://github.com/atakanekiz/CIPR_development/blob/master/CIPR_v4/data/immgen_recalc_ratio.rds?raw=true"))
+    ref_log <<- readRDS(url("https://github.com/atakanekiz/CIPR_development/blob/master/CIPR_v4/data/immgen_recalc_ratio.rds?raw=true"))
     
     
     # Read immgen annotation file for explanations of cell types
-    ref_annot <- readRDS(url("https://github.com/atakanekiz/CIPR_development/blob/master/CIPR_v4/data/immgen_annot.rds?raw=true"))
+    ref_annot <<- readRDS(url("https://github.com/atakanekiz/CIPR_development/blob/master/CIPR_v4/data/immgen_annot.rds?raw=true"))
     
     
   } else {
@@ -54,13 +62,22 @@ CIPR <- function(input_dat,
     ref_annot <- readRDS(custom_ref_annot_path)
     
   }
+    
+  } else if(exists("ref_log") & exists("ref_annot") & update_ref == F){
+    
+    ref_log <- get("ref_log", envir = .GlobalEnv)
+    ref_annot <- get("ref_annot", envir = .GlobalEnv)
+    
+  }
+  
+  
+  
+  
   
   ref_gene_column <- grep("gene", colnames(ref_log), ignore.case = T, value = T)
+ 
   
-  ################################################################################################################################
-  # Define a reactive cluster object that will store cluster information
-  # Get the clusters and sort them in incrementing order from cluster column
-  # This is needed to generate results per cluster
+  if(grepl("logfc", comp_method)){
   
   clusters <- gtools::mixedsort(
     levels(
@@ -71,11 +88,7 @@ CIPR <- function(input_dat,
     )
   )
   
-  
-  
-  
-  
-  
+  }
   
   ################################################################################################################################
   # Compare user_data against reference file
@@ -83,7 +96,7 @@ CIPR <- function(input_dat,
   message("Analyzing cluster signatures")
   
   
-  if(comp_method == "dot_product"){
+  if(comp_method == "logfc_dot_product"){    ####################################################################################
     
     # Initiate a master data frame to store the results
     master_df <- data.frame()
@@ -158,93 +171,186 @@ CIPR <- function(input_dat,
       
     } # close for loop that iterates over clusters
     
-  } else {  ################### Correlation methods ###########################################################
-
+  } else if(comp_method == "logfc_spearman" | comp_method == "logfc_pearson"){  ########################################################
+    
     # Initiate master data frame to store results
     master_df <- data.frame()
-
-
+    
+    
     # Iterate analysis for each cluster. The loop below will calculate a distinct correlation
     # coefficient for each cluster-reference cell pairs
     for (i in clusters) {
-
-
+      
+      
       trim_dat <- input_dat %>%
         filter(!!rlang::sym(cluster_column) == i)
-
+      
       dat_genes <- trim_dat[gene_column] %>% pull() %>% as.character
-      ref_genes <- ref_log[ref_gene_column] %>% pull() %>% as.character
-
+      ref_genes <- ref_log[, ..ref_gene_column] %>% pull() %>% as.character
+      
       common_genes <- intersect(dat_genes, ref_genes)
-
-
+      
+      
       trim_dat <- trim_dat %>%
         filter(!!rlang::sym(gene_column) %in% common_genes) %>%
         arrange(!!rlang::sym(gene_column)) %>%
         select(- !!rlang::sym(gene_column))
-
-
+      
+      
       trim_ref <- ref_log %>%
         filter(!!rlang::sym(ref_gene_column) %in% common_genes) %>%
         arrange(!!rlang::sym(ref_gene_column)) %>%
         select(- !!rlang::sym(ref_gene_column))
-
-
+      
+      
       # Calculate correlation between the the cluster (single column in trimmed input data) and each of the
       # reference cell subsets (columns of the trimmed reference data)
-      cor_df <- cor(trim_dat[logFC_column], trim_ref, method = comp_method)
-
+      cor_df <- cor(trim_dat[logFC_column], trim_ref, method = gsub("logfc_", "", comp_method))
+      
       # Store results in a data frame
       df <- data.frame(identity_score = cor_df[1,])
-
+      
       df <- rownames_to_column(df, var="reference_id")
-
+      
       # Combine results with reference annotations
-      if(input$sel_reference == "ImmGen"){
-
+      if(reference == "immgen"){
+        
         df <- left_join(df, ref_annot, by=c("reference_id" = "short_name"))
-
-
-
-
-
-      } else if (input$sel_reference == "Custom" & !is.null(input$annot_file)){
-
+        
+        
+        
+        
+        
+      } else if (reference == "custom" & !is.null(custom_ref_annot_path)){
+        
         df <- left_join(df, ref_annot, by=c("reference_id" = "short_name"))
-
-
-      } else if(input$sel_reference == "Custom" & is.null(input$annot_file)){
-
+        
+        
+      } else if(reference == "custom" & is.null(custom_ref_annot_path)){
+        
         # Fill in with reminder if annotation file is not updated
         df$reference_cell_type <- rep("Upload annotation file", dim(ref_log)[2]-1)
         df$short_name <- colnames(ref_log)[!colnames(ref_log) %in% ref_gene_column]
         df$long_name <- rep("Upload annotation file", dim(ref_log)[2]-1)
         df$description <- rep("Upload annotation file", dim(ref_log)[2]-1)
-
+        
       }
-
-
-
+      
+      
+      
       # Store cluster information in a column
       df$cluster <- i
-
+      
       # Add confidence-of-prediction calculations here and append to the df
       # Calculate the mean and standard deviation of the aggregate scores per reference cell type
       mean_cor_coeff <- mean(df$identity_score)
       cor_coeff_sd <- sd(df$identity_score)
-
+      
       # Calculate the distance of the identity score from population mean (how many std devs apart?)
       df$z_score <- (df$identity_score - mean_cor_coeff)/cor_coeff_sd
-
+      
       # Add all the results to the master data frame
       master_df <- rbind(master_df, df)
-
-
+      
+      
     } # close for loop that iterates over clusters
-
-}
-    if(global_results_obj == T) CIPR_results <<- master_df
     
+  } else if(comp_method == "all_genes_spearman" | comp_method == "all_genes_pearson"){  ################################################
+    
+    
+    
+    dat_genes <- input_dat[gene_column] %>% pull() %>% as.character
+    ref_genes <- ref_log[, ..ref_gene_column] %>% pull() %>% as.character
+    
+    common_genes <- intersect(dat_genes, ref_genes)
+    
+    trim_dat <- input_dat %>%
+      filter(!!rlang::sym(gene_column) %in% common_genes) %>%
+      arrange(!!rlang::sym(gene_column)) %>%
+      select_(.dots= paste0("-", gene_column))
+    
+    trim_ref <- ref_log %>%
+      filter(!!rlang::sym(ref_gene_column) %in% common_genes) %>%
+      arrange(!!rlang::sym(ref_gene_column)) %>%
+      select_(.dots=paste0("-", ref_gene_column))
+    
+    clusters <- colnames(trim_dat)
+    
+    
+    master_df <- data.frame()
+    
+      comp_method <- gsub("all_genes_", "", comp_method)
+      
+      for (i in clusters) {
+        
+
+        cor_df <- cor(trim_dat[i], trim_ref, method = comp_method)
+        
+        
+        df <- data.frame(identity_score = cor_df[1,])
+        
+        df <- rownames_to_column(df, var="reference_id")
+        
+        
+        
+        if(reference == "immgen"){
+          
+          df <- left_join(df, ref_annot, by=c("reference_id" = "short_name"))
+          
+          
+          
+          
+          
+        } else if (reference == "custom" & !is.null(custom_ref_annot_path)){
+          
+          df <- left_join(df, ref_annot, by=c("reference_id" = "short_name"))
+          
+          
+        } else if(reference == "custom" & is.null(custom_ref_annot_path)){
+          
+          df$reference_cell_type <- rep("Upload annotation file", dim(ref_log)[2]-1)
+          df$short_name <- colnames(ref_log)[!colnames(ref_log) %in% ref_gene_column]
+          df$long_name <- rep("Upload annotation file", dim(ref_log)[2]-1)
+          df$description <- rep("Upload annotation file", dim(ref_log)[2]-1)
+          
+        }
+        
+        
+        
+        
+        df$cluster <- i
+        
+        # Add confidence-of-prediction calculations here and append to the df
+        # Calculate the mean and standard deviation of the aggregate scores per reference cell type
+        mean_cor_coeff <- mean(df$identity_score)
+        cor_coeff_sd <- sd(df$identity_score)
+        
+        # Calculate the distance of the identity score from population mean (how many std devs apart?)
+        df$z_score <- (df$identity_score - mean_cor_coeff)/cor_coeff_sd
+        
+        
+        master_df <- rbind(master_df,df)
+        
+      }
+}
+  
+  
+  
+  
+  
+  
+  
+  
+  if(global_results_obj == T) CIPR_results <<- master_df
+  
+  
+  
+  
+  
+  
+  
+  
+  
   #prep individual plots
   if(plot_ind == T){
     
@@ -350,3 +456,6 @@ CIPR <- function(input_dat,
   }
   
 } # close function
+  
+  
+  
