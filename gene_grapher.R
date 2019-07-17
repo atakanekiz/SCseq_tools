@@ -14,7 +14,9 @@ gene_grapher <- function(exprs, # expression dataframe (generated with df_extrac
                          point_size = 0.2, # size of the jitter 
                          point_alpha = 0.2, # transparency of the jitter
                          add_mean = T, # Add a red colored point indicating mean value
+                         mean_color = "red",
                          add_median = T, # Add a blue colors point indicating median value
+                         median_color = "blue",
                          sort_plots = F, # Alphabetical ordering of plots based on gene name
                          colors_to_use = NULL, # Default is rainbow palette. You can provide a character vector
                          show_stats = T, # Calculate and show statistics on graph?
@@ -213,9 +215,9 @@ gene_grapher <- function(exprs, # expression dataframe (generated with df_extrac
     
     if(add_point == T){ p <- ggadd(p, add = "point", alpha=point_alpha, size = point_size) }
     
-    if(add_mean == T){ p <- ggadd(p, add = "mean", color = "red", size = 0.3)}
+    if(add_mean == T){ p <- ggadd(p, add = "mean", color = mean_color, size = 0.3)}
     
-    if(add_median == T){ p <- ggadd(p, add = "median", color = "blue", size = 0.3)}
+    if(add_median == T){ p <- ggadd(p, add = "median", color = median_color, size = 0.3)}
     
     if(show_stats == T){ tryCatch(error=function(x){},
                                   
