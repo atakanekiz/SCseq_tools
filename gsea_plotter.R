@@ -121,6 +121,7 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
     
   } else {
     
+   
     hits <- c(grep(plot_individual, res$pathway, ignore.case = T, value = T))
     
     # assign("hits", hits, .GlobalEnv)
@@ -193,6 +194,8 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
       ########################## 
       
     } else {
+      
+      if(verbose) message(paste("Plotting", hits))
       
       annot_padj <- signif(as.numeric(res[res$pathway==hits, "padj"]), digits = 2)
       annot_NES <- signif(as.numeric(res[res$pathway==hits, "NES"]),digits=2)

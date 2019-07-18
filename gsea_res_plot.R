@@ -150,6 +150,8 @@ gsea_res_plot <- function(res = NULL, #Previously calculated gsea results (globa
       
     } else {
       
+      if(verbose) message(paste("Plotting", hits))
+      
       annot_padj <- signif(as.numeric(res[res$pathway==hits, "padj"]), digits = 2)
       annot_NES <- signif(as.numeric(res[res$pathway==hits, "NES"]),digits=2)
       annot_ES <- signif(as.numeric(res[res$pathway==hits, "ES"]),digits=2)
