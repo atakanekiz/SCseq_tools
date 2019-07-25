@@ -200,7 +200,7 @@ gsea_plotter <- function(exprs = NULL, # Expression data frame (rows are cells, 
       annot_padj <- signif(as.numeric(res[res$pathway==hits, "padj"]), digits = 2)
       annot_NES <- signif(as.numeric(res[res$pathway==hits, "NES"]),digits=2)
       annot_ES <- signif(as.numeric(res[res$pathway==hits, "ES"]),digits=2)
-      x_pos <- length(ranked_genes)/5
+      x_pos <- length(ranked_genes)/4
       
       # grob<- grobTree(textGrob(paste("adj.p: ", annot_padj, "\nNES:", annot_NES),
       #                          x= 0.1, y=annot_ES, 
