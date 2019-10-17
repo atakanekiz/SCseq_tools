@@ -6,9 +6,12 @@
 
 df_extractor <- function(seurat_obj, 
                          metadata_to_extract = c(Cluster="orig_clusters",Sample="group"), # User defined metadata column name that has sample information 
-                         use_raw = F, # Set this to TRUE if you want to extract raw data
-                         humanize = T # Convert mouse genes to human homologs?
-){
+                         # use_raw = F, # Set this to TRUE if you want to extract raw data
+                         humanize = T, # Convert mouse genes to human homologs?
+                         assay = NULL, # which assay data to use. If null, default assay will be used
+                         slot = NULL  # which specific information to pull. If null, data slot will be used
+
+                         ){
   
   
   require(Seurat)
@@ -16,14 +19,14 @@ df_extractor <- function(seurat_obj,
   require(dplyr)
   
   
-  if(use_raw == F){
+ if(is.null(assay)) assay = DefaultAssay(seurat_obj)
+ if(is.null(slot)) slot = "data"
     
-    exprs <- as.data.frame(as.matrix(GetAssayData(object = seurat_obj)))
+    exprs <- as.data.frame(as.matrix(GetAssayData(object = seurat_obj, 
+                                                  assay = assay,
+                                                  slot = slot)))
     
-  } else {
     
-    exprs <- as.data.frame(as.matrix(GetAssayData(object = seurat_obj, slot = "counts")))
-    }
   
   
   
