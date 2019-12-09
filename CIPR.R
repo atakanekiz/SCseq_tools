@@ -133,15 +133,15 @@ CIPR <- function(input_dat,
     
     message("Applying variance filtering")
     
-    if(reference == "immgen"){
-      
-      var_vec <- readRDS(url("https://github.com/atakanekiz/CIPR/blob/master/data/var_vec.rds?raw=true"))
-      
-      keep_var <- quantile(var_vec, probs = 1-keep_top_var/100, na.rm = T)
-      
-      keep_genes <- var_vec >= keep_var
-      
-    } else{
+    # if(reference == "immgen"){
+    #   
+    #   var_vec <- readRDS(url("https://github.com/atakanekiz/CIPR/blob/master/data/var_vec.rds?raw=true"))
+    #   
+    #   keep_var <- quantile(var_vec, probs = 1-keep_top_var/100, na.rm = T)
+    #   
+    #   keep_genes <- var_vec >= keep_var
+    #   
+    # } else{
       
       var_vec <- apply(ref_dat[, ! colnames(ref_dat) %in% ref_gene_column], 1, var, na.rm=T)
       
@@ -149,7 +149,7 @@ CIPR <- function(input_dat,
       
       keep_genes <- var_vec >= keep_var
       
-    }
+    # }
     
     ref_dat <- ref_dat[keep_genes, ]
     
