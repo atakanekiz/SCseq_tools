@@ -4,6 +4,7 @@
 CIPR <- function(input_dat, 
                    comp_method = "logfc_dot_product",     # logfc_spearman, logfc_pearson, all_genes_spearman, all_genes_pearson
                    reference = NULL,                  # immgen, custom
+                   select_ref_subsets = "all",  # select reference cell subsets to be included in the analysis
                    custom_ref_dat_path = NULL,
                    custom_ref_annot_path = NULL,
                    keep_top_var = 100,                    # a number between 1-100
@@ -127,6 +128,24 @@ CIPR <- function(input_dat,
       } 
     
     }
+    
+    
+    # Select relevant subsets from the reference
+    
+    if(select_ref_subsets == "all"){
+      
+      select_ref_subsets <- seq_along(1:dim(ref_dat)[2])
+      
+    } else {
+      
+      sel_positions <- which(ref_annot[, "reference_cell_type"] %in% select_ref_subsets)
+      
+      select_ref_subsets <- ref_annot[sel_positions, "short_name"]
+      
+      
+    }
+    
+    ref_dat <- ref_dat[, select_ref_subsets]
     
     
     # Apply quantile filtering
