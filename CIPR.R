@@ -111,6 +111,9 @@ CIPR <- function(input_dat,
         
         ref_dat <- as.data.frame(readRDS(url("https://github.com/atakanekiz/CIPR/blob/master/data/immgen.rds?raw=true")))
         
+        # Read immgen annotation file for explanations of cell types
+        ref_annot <<- as.data.frame(readRDS(url("https://github.com/atakanekiz/CIPR/blob/master/data/immgen_annot.rds?raw=true")))
+        
         ref_gene_column <<- grep("gene", colnames(ref_dat), ignore.case = T, value = T)
         
       } else if (reference == "custom"){
@@ -196,7 +199,7 @@ CIPR <- function(input_dat,
     
   } else {
     
-    gtools::mixedsort(
+    clusters <- gtools::mixedsort(
       levels(
         as.factor(
           colnames(input_dat)[!grepl("gene", colnames(input_dat), ignore.case = T)]
