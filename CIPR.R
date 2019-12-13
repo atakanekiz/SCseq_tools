@@ -94,7 +94,7 @@ CIPR <- function(input_dat,
       
       if(select_ref_subsets == "all"){
         
-        select_ref_subsets <- seq_along(1:dim(ref_dat)[2])
+        select_ref_subsets <- as.character(ref_annot[, "short_name"])
         
       } else {
         
@@ -174,7 +174,7 @@ CIPR <- function(input_dat,
       
       if(select_ref_subsets == "all"){
         
-        select_ref_subsets <- seq_along(1:dim(ref_dat)[2])
+        select_ref_subsets <- as.character(ref_annot[, "short_name"])
         
       } else {
         
