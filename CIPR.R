@@ -105,7 +105,7 @@ CIPR <- function(input_dat,
         
       }
       
-      ref_dat <- ref_dat[, select_ref_subsets]
+      ref_dat <- ref_dat[, c(ref_gene_column, select_ref_subsets)]
       
       
       # Apply quantile filtering
@@ -185,7 +185,7 @@ CIPR <- function(input_dat,
         
       }
       
-      ref_dat <- ref_dat[, select_ref_subsets]
+      ref_dat <- ref_dat[, c(ref_gene_column, select_ref_subsets)]
       
       
       # Apply quantile filtering
