@@ -1,6 +1,4 @@
 # New CIPR script
-
-
 CIPR <- function(input_dat, 
                    comp_method = "logfc_dot_product",     # logfc_spearman, logfc_pearson, all_genes_spearman, all_genes_pearson
                    reference = NULL,                  # immgen, custom
@@ -90,6 +88,50 @@ CIPR <- function(input_dat,
         
         ref_gene_column <<- grep("gene", colnames(ref_dat), ignore.case = T, value = T)
         
+      }
+      
+      # Select relevant subsets from the reference
+      
+      if(select_ref_subsets == "all"){
+        
+        select_ref_subsets <- seq_along(1:dim(ref_dat)[2])
+        
+      } else {
+        
+        sel_positions <- which(ref_annot[, "reference_cell_type"] %in% select_ref_subsets)
+        
+        select_ref_subsets <- ref_annot[sel_positions, "short_name"]
+        
+        
+      }
+      
+      ref_dat <- ref_dat[, select_ref_subsets]
+      
+      
+      # Apply quantile filtering
+      
+      message("Applying variance filtering")
+      
+      # if(reference == "immgen"){
+      #   
+      #   var_vec <- readRDS(url("https://github.com/atakanekiz/CIPR/blob/master/data/var_vec.rds?raw=true"))
+      #   
+      #   keep_var <- quantile(var_vec, probs = 1-keep_top_var/100, na.rm = T)
+      #   
+      #   keep_genes <- var_vec >= keep_var
+      #   
+      # } else{
+      
+      var_vec <- apply(ref_dat[, ! colnames(ref_dat) %in% ref_gene_column], 1, var, na.rm=T)
+      
+      keep_var <- quantile(var_vec, probs = 1-keep_top_var/100, na.rm = T)
+      
+      keep_genes <- var_vec >= keep_var
+      
+      # }
+      
+      ref_dat <- ref_dat[keep_genes, ]
+        
         # Calculate row means for each gene (mean expression across the reference cell types)
         gene_avg <- rowMeans(ref_dat[, !colnames(ref_dat) %in% ref_gene_column])
         
@@ -102,8 +144,6 @@ CIPR <- function(input_dat,
         colnames(ref_dat)[1] <- ref_gene_column
         
         
-      }
-      
       
     } else {
       
@@ -133,47 +173,7 @@ CIPR <- function(input_dat,
     }
     
     
-    # Select relevant subsets from the reference
     
-    if(select_ref_subsets == "all"){
-      
-      select_ref_subsets <- seq_along(1:dim(ref_dat)[2])
-      
-    } else {
-      
-      sel_positions <- which(ref_annot[, "reference_cell_type"] %in% select_ref_subsets)
-      
-      select_ref_subsets <- ref_annot[sel_positions, "short_name"]
-      
-      
-    }
-    
-    ref_dat <- ref_dat[, select_ref_subsets]
-    
-    
-    # Apply quantile filtering
-    
-    message("Applying variance filtering")
-    
-    # if(reference == "immgen"){
-    #   
-    #   var_vec <- readRDS(url("https://github.com/atakanekiz/CIPR/blob/master/data/var_vec.rds?raw=true"))
-    #   
-    #   keep_var <- quantile(var_vec, probs = 1-keep_top_var/100, na.rm = T)
-    #   
-    #   keep_genes <- var_vec >= keep_var
-    #   
-    # } else{
-      
-      var_vec <- apply(ref_dat[, ! colnames(ref_dat) %in% ref_gene_column], 1, var, na.rm=T)
-      
-      keep_var <- quantile(var_vec, probs = 1-keep_top_var/100, na.rm = T)
-      
-      keep_genes <- var_vec >= keep_var
-      
-    # }
-    
-    ref_dat <- ref_dat[keep_genes, ]
     
   } else if(exists("ref_dat") & exists("ref_annot") & update_ref == F){
     
@@ -288,9 +288,9 @@ CIPR <- function(input_dat,
       
       
       
-    } # close for loop that iterates over clusters
+    } # close for loop that iterates over clusters1
     
-  } else if(comp_method == "logfc_spearman" | comp_method == "logfc_pearson"){  ########################################################
+ } else if(comp_method == "logfc_spearman" | comp_method == "logfc_pearson"){  ########################################################
     
     # Initiate master data frame to store results
     master_df <- data.frame()
