@@ -169,6 +169,48 @@ CIPR <- function(input_dat,
         ref_dat[, ref_gene_column] <- tolower(ref_dat[, ref_gene_column])
       
       } 
+      
+      # Select relevant subsets from the reference
+      
+      if(select_ref_subsets == "all"){
+        
+        select_ref_subsets <- seq_along(1:dim(ref_dat)[2])
+        
+      } else {
+        
+        sel_positions <- which(ref_annot[, "reference_cell_type"] %in% select_ref_subsets)
+        
+        select_ref_subsets <- ref_annot[sel_positions, "short_name"]
+        
+        
+      }
+      
+      ref_dat <- ref_dat[, select_ref_subsets]
+      
+      
+      # Apply quantile filtering
+      
+      message("Applying variance filtering")
+      
+      # if(reference == "immgen"){
+      #   
+      #   var_vec <- readRDS(url("https://github.com/atakanekiz/CIPR/blob/master/data/var_vec.rds?raw=true"))
+      #   
+      #   keep_var <- quantile(var_vec, probs = 1-keep_top_var/100, na.rm = T)
+      #   
+      #   keep_genes <- var_vec >= keep_var
+      #   
+      # } else{
+      
+      var_vec <- apply(ref_dat[, ! colnames(ref_dat) %in% ref_gene_column], 1, var, na.rm=T)
+      
+      keep_var <- quantile(var_vec, probs = 1-keep_top_var/100, na.rm = T)
+      
+      keep_genes <- var_vec >= keep_var
+      
+      # }
+      
+      ref_dat <- ref_dat[keep_genes, ]
     
     }
     
