@@ -100,7 +100,7 @@ CIPR <- function(input_dat,
         
         sel_positions <- which(ref_annot[, "reference_cell_type"] %in% select_ref_subsets)
         
-        select_ref_subsets <- ref_annot[sel_positions, "short_name"]
+        select_ref_subsets <- as.character(ref_annot[sel_positions, "short_name"])
         
         
       }
@@ -180,7 +180,7 @@ CIPR <- function(input_dat,
         
         sel_positions <- which(ref_annot[, "reference_cell_type"] %in% select_ref_subsets)
         
-        select_ref_subsets <- ref_annot[sel_positions, "short_name"]
+        select_ref_subsets <- as.character(ref_annot[sel_positions, "short_name"])
         
         
       }
