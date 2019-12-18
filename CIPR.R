@@ -53,7 +53,7 @@ CIPR <- function(input_dat,
     
     input_dat <- input_dat[!duplicated(input_dat[,gene_column]),]
     
-    if(length(gene_column) != 1) stop("Check column names of the input data. Data frame must have columns named as 'gene'")
+    if(length(gene_column) != 1) stop("Check column names of the input data. Data frame must have one column named as 'gene'")
     
   }
   
@@ -78,9 +78,6 @@ CIPR <- function(input_dat,
         # Read immgen annotation file for explanations of cell types
         ref_annot <<- as.data.frame(readRDS(url("https://github.com/atakanekiz/CIPR/blob/master/data/immgen_annot.rds?raw=true")))
         
-        # Name of the gene column in reference data
-        ref_gene_column <<- grep("gene", colnames(ref_dat), ignore.case = T, value = T)
-        
         
       } else {
         
@@ -92,10 +89,15 @@ CIPR <- function(input_dat,
         # Read immgen annotation file for explanations of cell types
         ref_annot <- readRDS(custom_ref_annot_path)
         
-        ref_gene_column <<- grep("gene", colnames(ref_dat), ignore.case = T, value = T)
-        
+       
       }
       
+     
+      
+      # Name of the gene column in reference data
+      ref_gene_column <- grep("gene", colnames(ref_dat), ignore.case = T, value = T)
+      
+      if(length(ref_gene_column) != 1) stop("Check column names of the input data. Data frame must have one column named as 'gene'")
       
       
       # Select relevant subsets from the reference
@@ -162,7 +164,9 @@ CIPR <- function(input_dat,
         # Read immgen annotation file for explanations of cell types
         ref_annot <<- as.data.frame(readRDS(url("https://github.com/atakanekiz/CIPR/blob/master/data/immgen_annot.rds?raw=true")))
         
-        ref_gene_column <<- grep("gene", colnames(ref_dat), ignore.case = T, value = T)
+        ref_gene_column <- grep("gene", colnames(ref_dat), ignore.case = T, value = T)
+        
+        if(length(ref_gene_column) != 1) stop("Check column names of the input data. Data frame must have one column named as 'gene'")
         
       } else if (reference == "custom"){
         
@@ -172,7 +176,9 @@ CIPR <- function(input_dat,
         # Read immgen annotation file for explanations of cell types
         ref_annot <- readRDS(custom_ref_annot_path)
 
-        ref_gene_column <<- grep("gene", colnames(ref_dat), ignore.case = T, value = T)
+        ref_gene_column <- grep("gene", colnames(ref_dat), ignore.case = T, value = T)
+        
+        if(length(ref_gene_column) != 1) stop("Check column names of the input data. Data frame must have one column named as 'gene'")
         
         ref_dat[, ref_gene_column] <- tolower(ref_dat[, ref_gene_column])
       
