@@ -36,10 +36,13 @@ CIPR <- function(input_dat,
     cluster_column <<- grep("cluster", colnames(input_dat), ignore.case = T, value = T)
     
     
+    if(length(c(gene_column, logFC_column, cluster_column)) != 3) stop("Check column names of the input data. Data frame must have columns named as 'gene', 'logfc', and 'cluster'")
+    
     # Convert gene symbols to lower case letters to allow mouse-vs-human comparisons
     input_dat[,gene_column] <- tolower(input_dat[,gene_column])
     
     # input_dat <- input_dat[!duplicated(input_dat[,gene_column]),]
+    
     
     
   } else {
@@ -50,7 +53,10 @@ CIPR <- function(input_dat,
     
     input_dat <- input_dat[!duplicated(input_dat[,gene_column]),]
     
+    if(length(gene_column) != 1) stop("Check column names of the input data. Data frame must have columns named as 'gene'")
+    
   }
+  
   
   
   
@@ -89,6 +95,8 @@ CIPR <- function(input_dat,
         ref_gene_column <<- grep("gene", colnames(ref_dat), ignore.case = T, value = T)
         
       }
+      
+      
       
       # Select relevant subsets from the reference
       
