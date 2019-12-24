@@ -1,18 +1,20 @@
 # New CIPR script
 CIPR <- function(input_dat, 
-                   comp_method = "logfc_dot_product",     # logfc_spearman, logfc_pearson, all_genes_spearman, all_genes_pearson
-                   reference = NULL,                  # immgen, custom
-                   select_ref_subsets = "all",  # select reference cell subsets to be included in the analysis
-                   custom_ref_dat_path = NULL,
-                   custom_ref_annot_path = NULL,
-                   keep_top_var = 100,                    # a number between 1-100
-                   plot_ind = F, 
-                   plot_top = T, 
-                   top_num = 5, 
-                   save_png = F, 
-                   global_plot_obj = T,
-                   global_results_obj = T,
-                   update_ref = T){
+                 comp_method = "logfc_dot_product",     # logfc_spearman, logfc_pearson, all_genes_spearman, all_genes_pearson
+                 reference = NULL,                  # immgen, custom
+                 select_ref_subsets = "all",  # select reference cell subsets to be included in the analysis
+                 custom_ref_dat_path = NULL,
+                 custom_ref_annot_path = NULL,
+                 keep_top_var = 100,                    # a number between 1-100
+                 plot_ind = F, 
+                 plot_top = T, 
+                 top_num = 5, 
+                 save_png = F, 
+                 global_plot_obj = T,
+                 global_results_obj = T,
+                 update_ref = T,
+                 ... # parameters to pass to theme()
+){
   
   
   suppressMessages({
@@ -89,10 +91,10 @@ CIPR <- function(input_dat,
         # Read immgen annotation file for explanations of cell types
         ref_annot <- readRDS(custom_ref_annot_path)
         
-       
+        
       }
       
-     
+      
       
       # Name of the gene column in reference data
       ref_gene_column <- grep("gene", colnames(ref_dat), ignore.case = T, value = T)
@@ -141,19 +143,19 @@ CIPR <- function(input_dat,
       # }
       
       ref_dat <- ref_dat[keep_genes, ]
-        
-        # Calculate row means for each gene (mean expression across the reference cell types)
-        gene_avg <- rowMeans(ref_dat[, !colnames(ref_dat) %in% ref_gene_column])
-        
-        # Log scale data
-        reference_ratio <- sweep(ref_dat[,!colnames(ref_dat) %in% ref_gene_column], 1, FUN="-", gene_avg)
-        
-        # Combine gene names and the log fold change in one data frame
-        ref_dat <- cbind(tolower(ref_dat[, ref_gene_column]), reference_ratio)
-        
-        colnames(ref_dat)[1] <- ref_gene_column
-        
-        
+      
+      # Calculate row means for each gene (mean expression across the reference cell types)
+      gene_avg <- rowMeans(ref_dat[, !colnames(ref_dat) %in% ref_gene_column])
+      
+      # Log scale data
+      reference_ratio <- sweep(ref_dat[,!colnames(ref_dat) %in% ref_gene_column], 1, FUN="-", gene_avg)
+      
+      # Combine gene names and the log fold change in one data frame
+      ref_dat <- cbind(tolower(ref_dat[, ref_gene_column]), reference_ratio)
+      
+      colnames(ref_dat)[1] <- ref_gene_column
+      
+      
       
     } else {
       
@@ -175,13 +177,13 @@ CIPR <- function(input_dat,
         
         # Read immgen annotation file for explanations of cell types
         ref_annot <- readRDS(custom_ref_annot_path)
-
+        
         ref_gene_column <- grep("gene", colnames(ref_dat), ignore.case = T, value = T)
         
         if(length(ref_gene_column) != 1) stop("Check column names of the input data. Data frame must have one column named as 'gene'")
         
         ref_dat[, ref_gene_column] <- tolower(ref_dat[, ref_gene_column])
-      
+        
       } 
       
       # Select relevant subsets from the reference
@@ -225,7 +227,7 @@ CIPR <- function(input_dat,
       # }
       
       ref_dat <- ref_dat[keep_genes, ]
-    
+      
     }
     
     
@@ -346,7 +348,7 @@ CIPR <- function(input_dat,
       
     } # close for loop that iterates over clusters1
     
- } else if(comp_method == "logfc_spearman" | comp_method == "logfc_pearson"){  ########################################################
+  } else if(comp_method == "logfc_spearman" | comp_method == "logfc_pearson"){  ########################################################
     
     # Initiate master data frame to store results
     master_df <- data.frame()
@@ -558,7 +560,8 @@ CIPR <- function(input_dat,
                  fill = "gray50", alpha = .1)+
         annotate("rect", xmin = 1, xmax = length(df_plot$reference_id),
                  ymin = score_mean-2*score_sd, ymax = score_mean+2*score_sd,
-                 fill = "gray50", alpha = .1)
+                 fill = "gray50", alpha = .1)+
+        theme(...)
       
       
     }
@@ -614,7 +617,8 @@ CIPR <- function(input_dat,
                    fill = "cluster", size=1, x.text.angle=90, 
                    font.legend = c(15, "plain", "black")) +
       scale_x_discrete(labels=top_df$reference_id)+
-      theme(axis.text.x = element_text(vjust=0.5, hjust=1))
+      theme(axis.text.x = element_text(vjust=0.5, hjust=1))+
+      theme(...)
     
     if(global_plot_obj == T) top_plots <<- p
     
@@ -629,5 +633,5 @@ CIPR <- function(input_dat,
     }
     
   }
-
+  
 } # close function
