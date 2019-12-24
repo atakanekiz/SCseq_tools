@@ -549,7 +549,7 @@ CIPR <- function(input_dat,
       ind_clu_plots[[plotname]] <- ggdotplot(df_plot, x = "reference_id", y="identity_score", 
                                              fill = "reference_cell_type", xlab=F, ylab="Reference identity score",
                                              font.y = c(14, "bold", "black"), size=1, x.text.angle=90,
-                                             title = paste("Cluster:",my_i), font.title = c(15, "bold.italic"),
+                                             title = paste("Cluster:",i), font.title = c(15, "bold.italic"),
                                              font.legend = c(15, "plain", "black"))+
         theme(axis.text.x = element_text(size=10, vjust=0.5, hjust=1))+
         geom_hline(yintercept=score_mean)+
