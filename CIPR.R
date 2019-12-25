@@ -293,6 +293,7 @@ CIPR <- function(input_dat,
       # Merge SCseq cluster log FC value with immgen log FC for shared genes
       merged <- merge(sel_clst, ref_dat, by.x = gene_column, by.y = ref_gene_column)
       
+      if(dim(merged)[1] < 2) next
       
       # Calculate a scoring matrix by multiplying log changes of clusters and immgen cells
       reference_scoring <- data.frame(apply(merged[,3:dim(merged)[2]],2,function(x){x*merged[,2]}), check.names = FALSE)
