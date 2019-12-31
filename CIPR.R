@@ -1,11 +1,117 @@
-# New CIPR script
+#' Cluster Identity Predictor
+#' 
+#' @param input_dat Data frame containing normalized log2-transformed gene 
+#' expression values per cluster OR a table of differentially expressed genes 
+#' per cluster
+#' 
+#' @param comp_method Method to use for identity score calculations. It accepts 
+#' one of the following: "logfc_dot_product" (default), "logfc_spearman",
+#' "logfc_pearson", "all_genes_spearman", "all_genes_pearson"
+#'
+#' @param reference Reference data frame containing gene expression data from
+#' known cell types. It accepts one of the following: "immgen" (default), 
+#' "MMrnaseq", "blueprint-encode", "hpca", "dice", "hema", "HSrnaseq", "custom"
+#' 
+#' @param select_ref_subsets The names of cell subsets to be included in the
+#' analysis. For using the entire reference dataset use "all", or
+#' provide a character vector of cell types of interest. Defaults to "all"
+#' 
+#' @param custom_ref_dat_path The filepath pointing to the reference expression
+#'  data frame (needed if a custom reference is used) Defaults to NULL
+#' 
+#' @param custom_ref_annot_path The filepath pointing to the reference 
+#' annotation data frame (needed if a custom reference is used). Defaults to 
+#' NULL.
+#' 
+#' @param keep_top_var Top n percent of highly variant reference genes to 
+#' include in the analysis. It accepts a numeric value smaller than or equal 
+#' to 100 (default). The value of 100 results in keeping all the genes in the 
+#' reference dataset)
+#' 
+#' @param plot_ind Logical value. Set it to TRUE to plot identity scores for 
+#' each cluster. Defaults to FALSE
+#' 
+#' @param plot_top Logical value. set it to TRUE to plot top scoring reference
+#' cell types for each cluster. Defaults ot TRUE.
+#' 
+#' @param top_num A numeric value determining how many top scoring reference
+#' cell types will be plotted for each cluster. Defaults to 5. 
+#' 
+#' @param save_png Logical value. Set it to TRUE if you would like to export png
+#' images of the results. Defaults to FALSE
+#'
+#' @param global_plot_obj Logical value. Set it to TRUE if you would like to
+#' keep the plots as an object in the global environment. This can be useful
+#' for accessing and manipulating the graphs. Defaults to TRUE.
+#' 
+#' @param global_results_obj Logical value. Set it to TRUE if you would like to
+#' keep the analysis results as a global object. Defaults to TRUE.
+#' 
+#' @param update_ref Logical value. Set it to FALSE if you would like to use a 
+#' previously called reference data. Reusing an existing reference dataset can
+#' reduce the compute times during iterative analysis. However, setting this to 
+#' TRUE is useful for benchmarking.
+#' 
+#' @param ... arguments to pass to theme() (for graph manipulation)
+#'       
+#' @return Graphical outputs and/or data frames of identity scores calculated 
+#' for each cluster in the input data.
+#' 
+#' @examples 
+#' 
+#' # Using built-in immgen as reference
+#' 
+#' CIPR(input_dat = allmarkers, 
+#' comp_method = "logfc_dot_product",
+#' reference="immgen",
+#' keep_top_var = 100,
+#' global_results_obj = T,
+#' plot_top = T) 
+#' 
+#' 
+#' #' # Using built-in dice as reference (variance threshold of top 50%)
+#' 
+#' CIPR(input_dat = allmarkers, 
+#' comp_method = "logfc_dot_product",
+#' reference="dice",
+#' keep_top_var = 50,
+#' global_results_obj = T,
+#' plot_top = T) 
+#' 
+#' 
+#' # Using a custom reference
+#' 
+#' CIPR(input_dat = allmarkers, 
+#' comp_method = "logfc_dot_product",
+#' reference="custom",
+#' custom_ref_dat_path = "../../custom_exprs.rds", 
+#' custom_ref_annot_path = "../../custom_annot.rds",
+#' keep_top_var = 100,
+#' global_results_obj = T,
+#' plot_top = T)
+#' 
+#' 
+#' #' # Using a blueprint-encode reference and limiting the analysis
+#' # to "Pericytes", "Skeletal muscle", "Smooth muscle"
+#' 
+#' CIPR(input_dat = allmarkers, 
+#' comp_method = "logfc_dot_product",
+#' reference="blueprint-encode",
+#' select_ref_subsets = c("Pericytes", "Skeletal muscle", "Smooth muscle")
+#' keep_top_var = 100,
+#' global_results_obj = T,
+#' plot_top = T)
+#' 
+
+
+
 CIPR <- function(input_dat, 
-                 comp_method = "logfc_dot_product",     # logfc_spearman, logfc_pearson, all_genes_spearman, all_genes_pearson
-                 reference = NULL,                  # immgen, custom
-                 select_ref_subsets = "all",  # select reference cell subsets to be included in the analysis
+                 comp_method = "logfc_dot_product",
+                 reference = NULL,    #####
+                 select_ref_subsets = "all",
                  custom_ref_dat_path = NULL,
                  custom_ref_annot_path = NULL,
-                 keep_top_var = 100,                    # a number between 1-100
+                 keep_top_var = 100,                  
                  plot_ind = F, 
                  plot_top = T, 
                  top_num = 5, 
@@ -70,7 +176,7 @@ CIPR <- function(input_dat,
     
     if(grepl("logfc", comp_method)){
       
-      if(reference == "immgen"){
+      if(reference == "immgen"){ # change to != custom
         
         message("Reading ImmGen (v1+v2) reference data")
         
