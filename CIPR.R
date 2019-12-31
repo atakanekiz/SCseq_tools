@@ -10,7 +10,7 @@
 #'
 #' @param reference Reference data frame containing gene expression data from
 #' known cell types. It accepts one of the following: "immgen" (default), 
-#' "MMrnaseq", "blueprint-encode", "hpca", "dice", "hema", "HSrnaseq", "custom"
+#' "mmrnaseq", "blueprint", "hpca", "dice", "hema", "hsrnaseq", "custom"
 #' 
 #' @param select_ref_subsets The names of cell subsets to be included in the
 #' analysis. For using the entire reference dataset use "all", or
@@ -107,7 +107,7 @@
 
 CIPR <- function(input_dat, 
                  comp_method = "logfc_dot_product",
-                 reference = NULL,    #####
+                 reference = NULL,    
                  select_ref_subsets = "all",
                  custom_ref_dat_path = NULL,
                  custom_ref_annot_path = NULL,
@@ -119,7 +119,7 @@ CIPR <- function(input_dat,
                  global_plot_obj = T,
                  global_results_obj = T,
                  update_ref = T,
-                 ... # parameters to pass to theme()
+                 ... 
 ){
   
   
@@ -174,7 +174,7 @@ CIPR <- function(input_dat,
   
   if(update_ref == T){
     
-    if(grepl("logfc", comp_method)){
+    if(grepl("logfc", comp_method)){ # move this below make ref reading consistent
       
       if(reference == "immgen"){ # change to != custom
         
